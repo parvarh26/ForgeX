@@ -25,3 +25,12 @@ class LLMService:
         tokens = re.findall(r'\b[a-z][a-z0-9]{2,}\b', combined)
         filtered = [t for t in tokens if t not in _STOP_WORDS]
         most_common = Counter(filtered).most_common(top_n)
+        return [word for word, _ in most_common]
+
+    def generate_cluster_insight(self, context_texts: list[str]) -> str:
+        """
+        Generates a 1-sentence actionable insight derived from the actual
+        titles/bodies of clustered issues.
+        Falls back to mock heuristic if LLM provider is 'mock' or no API key.
+        """
+        if not context_texts:
