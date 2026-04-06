@@ -213,3 +213,8 @@ async def background_crawl(repo: str, db_factory):
     finally:
         db.close()
 
+@router.post("/sync")
+async def sync_repository(request: SyncRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    """
+    POST /api/v1/github/sync
+    
