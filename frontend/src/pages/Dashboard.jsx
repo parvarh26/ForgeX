@@ -310,3 +310,11 @@ export default function Dashboard() {
       <h2 style={{ marginBottom: '32px' }}>FAISS Index Metadata</h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         {[
+          { label: 'Dimensions', value: '384 (all-MiniLM-L6-v2)' },
+          { label: 'Index Type', value: 'IndexFlatL2 (Brute-force Exact)' },
+          { label: 'Total Vectors', value: progress.processed },
+          { label: 'Memory Footprint', value: `${(progress.processed * 384 * 4 / 1024).toFixed(2)} KB` },
+        ].map(item => (
+          <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: 'var(--border-subtle)', paddingBottom: '12px' }}>
+            <span style={{ color: 'var(--color-text-secondary)' }}>{item.label}</span>
+            <span style={{ fontWeight: 600 }}>{item.value}</span>
