@@ -4,3 +4,9 @@
   --color-surface: #0a0a0a;
   --color-surface-hover: #141414;
   --color-surface-elevated: #1a1a1a;
+  
+  /* Text */
+  --color-text-primary: #ededed;
+  --color-text-secondary: #888888;
+  --color-text-muted: #555555;
+  
