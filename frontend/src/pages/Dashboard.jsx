@@ -134,3 +134,11 @@ function ClusterCard({ cluster, index }) {
             }}
             onMouseEnter={e => { e.currentTarget.style.color = 'var(--color-text-primary)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
             onMouseLeave={e => { e.currentTarget.style.color = 'var(--color-text-secondary)'; e.currentTarget.style.borderColor = 'var(--border-subtle)'; e.currentTarget.style.background = 'rgba(255,255,255,0.02)'; }}
+          >
+            #{num}
+          </a>
+        ))}
+        {cluster.github_issue_numbers?.length > 10 && (
+          <span style={{ padding: '5px 10px', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+            +{cluster.github_issue_numbers.length - 10} others
+          </span>
