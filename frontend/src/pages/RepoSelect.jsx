@@ -208,3 +208,9 @@ export default function RepoSelect() {
               }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = 'var(--color-text-primary)'; e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-subtle)'; e.currentTarget.style.color = 'var(--color-text-secondary)'; e.currentTarget.style.background = 'rgba(255,255,255,0.02)'; }}
+            >
+              <GitBranch size={12} /> {r}
+            </button>
+          ))}
+        </div>
+      </div>
