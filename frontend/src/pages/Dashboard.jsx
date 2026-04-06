@@ -46,3 +46,11 @@ function StatusPill({ msg, streaming, complete, hasError }) {
       borderRadius: 'var(--radius-pill)',
       fontSize: '0.8rem',
       color: color,
+      maxWidth: '500px',
+      backdropFilter: 'blur(8px)'
+    }}>
+      <Icon size={14} style={streaming && !complete && !hasError ? { animation: 'spin 2s linear infinite' } : {}} />
+      <span style={{ fontWeight: 500 }}>{msg || (streaming ? 'Pipeline initializing...' : 'Awaiting stream...')}</span>
+    </div>
+  );
+}
