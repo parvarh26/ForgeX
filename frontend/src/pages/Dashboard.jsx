@@ -198,3 +198,11 @@ export default function Dashboard() {
     setHasError(false);
     setStreaming(true);
     setStatusMsg('Initializing SSE bridge...');
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    try {
+      const response = await fetch('http://localhost:8000/api/v1/github/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
