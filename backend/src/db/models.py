@@ -41,9 +41,13 @@ class ClusterModel(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     repo_name = Column(String, index=True, nullable=False, default="unknown")
-    summary_insight = Column(String)
+    cluster_label = Column(Integer, index=True)
     size = Column(Integer)
     urgency = Column(String)
+    summary_insight = Column(String)
+    llm_full_analysis = Column(String)
+    similarity_score = Column(Float)
+    github_issue_numbers = Column(String) # Comma-separated list
 
 # Init DB — runs at import time to ensure schema is always current
 Base.metadata.create_all(bind=engine)

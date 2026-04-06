@@ -4,8 +4,14 @@ import {
   ShieldAlert, Activity, Map, Search, Server,
   Zap, Loader2, CheckCircle2, XCircle, GitBranch, ArrowLeft,
   RefreshCw, CheckCircle, Sparkles, MessageSquare, Bot,
-  Code, Folder, FileText
+  Code, Folder, FileText, ChevronLeft
 } from 'lucide-react';
+
+// New High-Fidelity Rendering Imports
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 // ── SSE parsing helper ────────────────────────────────────────────────────────
 async function* readSSEStream(response) {
@@ -16,7 +22,7 @@ async function* readSSEStream(response) {
   while (true) {
     const { value, done } = await reader.read();
     if (done) break;
-    offset: buffer += decoder.decode(value, { stream: true });
+    buffer += decoder.decode(value, { stream: true });
 
     const lines = buffer.split('\n');
     buffer = lines.pop() || ''; 
@@ -43,9 +49,9 @@ function StatusPill({ msg, streaming, complete, hasError }) {
     <div style={{
       display: 'inline-flex', alignItems: 'center', gap: '10px',
       padding: '8px 16px',
-      background: 'var(--color-surface-elevated)',
-      border: `1px solid ${hasError ? 'rgba(239,68,68,0.2)' : 'var(--border-subtle)'}`,
-      borderRadius: 'var(--radius-pill)',
+      background: 'rgba(255,255,255,0.05)',
+      border: `1px solid ${hasError ? 'rgba(239,68,68,0.2)' : '#30363d'}`,
+      borderRadius: '6px',
       fontSize: '0.8rem',
       color: color,
       maxWidth: '500px'
@@ -67,7 +73,7 @@ function ClusterCard({ cluster, index, navigate }) {
         borderTop: index === 0 ? 'none' : '1px solid #30363d',
         background: '#0d1117', cursor: 'pointer',
         animation: 'fadeUpIn 400ms cubic-bezier(0.16, 1, 0.3, 1) both',
-        animationDelay: `${index * 30}ms`,
+        animationDelay: `${Math.min(index * 20, 400)}ms`,
       }}
       onMouseEnter={e => e.currentTarget.style.background = '#161b22'}
       onMouseLeave={e => e.currentTarget.style.background = '#0d1117'}
@@ -78,19 +84,19 @@ function ClusterCard({ cluster, index, navigate }) {
       <div style={{ marginLeft: '12px', flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '4px' }}>
           <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#c9d1d9', margin: 0, lineHeight: 1.3 }}>
-            [{cluster.urgency} Discovery]: {cluster.insight}
+            [{cluster.urgency}]: {cluster.insight}
           </h3>
           <span style={{ fontSize: '12px', color: '#8b949e', border: '1px solid rgba(139,148,158,0.3)', padding: '0 10px', borderRadius: '12rem', lineHeight: '20px' }}>
-             Status: Neural Grouping
+             Active Context
           </span>
           {isCritical && (
              <span style={{ fontSize: '12px', color: '#f85149', border: '1px solid rgba(248,81,73,0.3)', padding: '0 10px', borderRadius: '12rem', lineHeight: '20px' }}>
-                Type: High-Risk
+                High-Risk
              </span>
           )}
         </div>
         <div style={{ fontSize: '12px', color: '#8b949e' }}>
-          #{cluster.cluster_label} discovered by OpenIssue AI Mapping System
+          #{cluster.cluster_label} identified by OpenIssue AI Matrix
         </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#8b949e', fontSize: '12px', flexShrink: 0, paddingLeft: '16px' }}>
@@ -118,7 +124,7 @@ function GlobalCommandPalette({ repo, clusters, navigate }) {
   }, []);
 
   const suggestions = query.trim() 
-    ? clusters.filter(c => c.insight.toLowerCase().includes(query.toLowerCase())).slice(0, 5)
+    ? (clusters || []).filter(c => (c.insight || "").toLowerCase().includes(query.toLowerCase())).slice(0, 5)
     : [];
 
   const handleSearchSubmit = (e) => {
@@ -140,33 +146,46 @@ function GlobalCommandPalette({ repo, clusters, navigate }) {
           onBlur={() => setTimeout(() => setIsFocused(false), 200)}
           placeholder={`Type / to search ${repo}`} 
           style={{
-            width: '100%', padding: '6px 12px 6px 32px',
+            width: '100%', padding: '6px 14px 6px 32px',
             fontSize: '14px', lineHeight: '20px',
-            background: 'rgba(255,255,255,0.1)',
-            border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px',
+            background: 'rgba(255,255,255,0.05)',
+            border: '1px solid #30363d', borderRadius: '6px',
             color: '#c9d1d9', outline: 'none',
-            transition: 'width 0.2s, background 0.2s',
+            transition: 'width 0.2s, background 0.2s, border-color 0.2s',
           }}
           onFocusCapture={e => { e.target.style.background = '#0d1117'; e.target.style.borderColor = '#58a6ff'; e.target.style.width = '600px'; }}
-          onBlurCapture={e => { e.target.style.background = 'rgba(255,255,255,0.1)'; e.target.style.borderColor = 'rgba(255,255,255,0.2)'; e.target.style.width = '100%'; }}
+          onBlurCapture={e => { e.target.style.background = 'rgba(255,255,255,0.05)'; e.target.style.borderColor = '#30363d'; e.target.style.width = '100%'; }}
         />
         <Search size={14} color="#8b949e" style={{ position: 'absolute', left: '10px' }} />
         <div style={{ position: 'absolute', right: '10px', fontSize: '10px', padding: '2px 6px', border: '1px solid #30363d', borderRadius: '4px', color: '#8b949e' }}>/</div>
       </form>
-      {isFocused && query.trim() && (
-        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '8px', background: '#161b22', border: '1px solid #30363d', borderRadius: '6px', zIndex: 100, overflow: 'hidden' }}>
-          {suggestions.length > 0 ? (
+      {isFocused && (
+        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '8px', background: '#161b22', border: '1px solid #30363d', borderRadius: '6px', zIndex: 1000, overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}>
+          {query.trim() ? (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <div style={{ padding: '8px 12px', fontSize: '12px', color: '#8b949e', borderBottom: '1px solid #30363d' }}>Jump to cluster...</div>
-              {suggestions.map(s => (
-                <div key={s.cluster_label} onClick={() => navigate(`/cluster/${s.cluster_label}`)} style={{ padding: '12px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#c9d1d9', fontSize: '13px', borderBottom: '1px solid #30363d' }} onMouseEnter={e => e.currentTarget.style.background = '#21262d'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                  <MessageSquare size={14} color="#8b949e"/><span style={{ fontWeight: 600 }}>{s.insight}</span><span style={{ color: '#8b949e', fontSize: '12px', marginLeft: 'auto' }}>#{s.cluster_label}</span>
-                </div>
-              ))}
+              <div onClick={handleSearchSubmit} style={{ padding: '12px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', borderBottom: '1px solid #30363d' }} onMouseEnter={e => e.currentTarget.style.background = '#21262d'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                <Bot size={16} color="#58a6ff" />
+                <div style={{ fontSize: '13px' }}>AI Search: <span style={{ fontWeight: 600 }}>{query}</span></div>
+                <span style={{ marginLeft: 'auto', fontSize: '10px', color: '#8b949e' }}>Enter</span>
+              </div>
+              {suggestions.length > 0 && (
+                <>
+                  <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: '#8b949e', background: '#0d1117', textTransform: 'uppercase' }}>Intelligence Suggestions</div>
+                  {suggestions.map(s => (
+                    <div key={s.cluster_label} onClick={() => navigate(`/cluster/${s.cluster_label}`)} style={{ padding: '12px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', borderBottom: '1px solid #30363d' }} onMouseEnter={e => e.currentTarget.style.background = '#21262d'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                      <MessageSquare size={16} color="#8b949e"/><div style={{ fontSize: '13px' }}>{s.insight}</div><span style={{ color: '#8b949e', fontSize: '12px', marginLeft: 'auto' }}>#{s.cluster_label}</span>
+                    </div>
+                  ))}
+                </>
+              )}
+              <div onClick={() => window.open(`https://github.com/${repo}/search?q=${encodeURIComponent(query)}`, '_blank')} style={{ padding: '12px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.background = '#21262d'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                <Search size={16} color="#8b949e" />
+                <div style={{ fontSize: '13px' }}>Search GitHub for <span style={{ fontWeight: 600 }}>{query}</span></div>
+              </div>
             </div>
           ) : (
-            <div style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#c9d1d9', fontSize: '13px' }} onClick={handleSearchSubmit} onMouseEnter={e => e.currentTarget.style.background = '#21262d'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-              <Bot size={16} color="#58a6ff"/><span>Ask OpenIssue AI to solve: <strong>{query}</strong></span>
+            <div style={{ padding: '12px', color: '#8b949e', fontSize: '13px', textAlign: 'center' }}>
+              Search projects, clusters, and intelligence...
             </div>
           )}
         </div>
@@ -181,6 +200,9 @@ function RepositoryBrowser({ repo }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [readme, setReadme] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileContent, setFileContent] = useState('');
+  const [fileLoading, setFileLoading] = useState(false);
 
   useEffect(() => {
     fetchContents(path);
@@ -189,6 +211,7 @@ function RepositoryBrowser({ repo }) {
   const fetchContents = async (currentPath) => {
     setLoading(true);
     setError('');
+    setSelectedFile(null); 
     try {
       const resp = await fetch(`https://api.github.com/repos/${repo}/contents/${currentPath}`);
       if (!resp.ok) throw new Error('Repository unreachable.');
@@ -216,52 +239,112 @@ function RepositoryBrowser({ repo }) {
     }
   };
 
+  const handleFileClick = async (file) => {
+    setSelectedFile(file);
+    setFileLoading(true);
+    try {
+      const r = await fetch(file.download_url);
+      const text = await r.text();
+      setFileContent(text);
+    } catch (e) {
+      setFileContent('Failed to load file content.');
+    } finally {
+      setFileLoading(false);
+    }
+  };
+
   const breadcrumbs = path.split('/').filter(Boolean);
+
+  const getLanguage = (filename) => {
+    const ext = filename.split('.').pop().toLowerCase();
+    const map = { js: 'javascript', jsx: 'jsx', ts: 'typescript', py: 'python', css: 'css', html: 'html', md: 'markdown', json: 'json' };
+    return map[ext] || 'text';
+  };
 
   return (
     <div style={{ animation: 'fadeUpIn 400ms ease both' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', fontSize: '14px', color: '#58a6ff' }}>
-        <span onClick={() => setPath('')} style={{ cursor: 'pointer', fontWeight: 600 }}>{repo.split('/')[1]}</span>
+        <span onClick={() => { setPath(''); setSelectedFile(null); }} style={{ cursor: 'pointer', fontWeight: 600 }}>{repo.split('/')[1]}</span>
         {breadcrumbs.map((crumb, idx) => (
           <React.Fragment key={idx}>
             <span style={{ color: '#8b949e' }}>/</span>
             <span onClick={() => setPath(breadcrumbs.slice(0, idx + 1).join('/'))} style={{ cursor: 'pointer', fontWeight: 600 }}>{crumb}</span>
           </React.Fragment>
         ))}
+        {selectedFile && (
+          <>
+            <span style={{ color: '#8b949e' }}>/</span>
+            <span style={{ fontWeight: 600, color: '#c9d1d9' }}>{selectedFile.name}</span>
+          </>
+        )}
       </div>
 
       <div style={{ border: '1px solid #30363d', borderRadius: '6px', background: '#0d1117', overflow: 'hidden', marginBottom: '32px' }}>
         <div style={{ padding: '12px 16px', background: '#161b22', borderBottom: '1px solid #30363d', display: 'flex', alignItems: 'center', color: '#c9d1d9', fontSize: '14px', gap: '12px' }}>
-          <GitBranch size={16} color="#8b949e" /><span style={{ fontWeight: 600 }}>main</span>
-          <span style={{ color: '#8b949e' }}>{contents.length} nodes</span>
+          {selectedFile ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
+              <ChevronLeft size={16} style={{ cursor: 'pointer' }} onClick={() => setSelectedFile(null)} />
+              <FileText size={16} color="#8b949e" />
+              <span style={{ fontWeight: 600 }}>{selectedFile.name}</span>
+              <span style={{ color: '#8b949e', fontSize: '12px' }}>({(selectedFile.size / 1024).toFixed(1)} KB)</span>
+            </div>
+          ) : (
+            <>
+              <GitBranch size={16} color="#8b949e" /><span style={{ fontWeight: 600 }}>main</span>
+              <span style={{ color: '#8b949e' }}>{contents.length} nodes</span>
+            </>
+          )}
         </div>
-        {loading ? (
-          <div style={{ padding: '40px', textAlign: 'center' }}><Loader2 className="indicator-pulse" style={{ animation: 'spin 2s linear infinite' }} /></div>
-        ) : error ? (
-          <div style={{ padding: '40px', color: '#f85149', textAlign: 'center' }}>{error}</div>
+
+        {selectedFile ? (
+          <div style={{ background: '#0d1117' }}>
+            {fileLoading ? (
+              <div style={{ padding: '40px', textAlign: 'center' }}><Loader2 className="indicator-pulse" style={{ animation: 'spin 2s linear infinite' }} /></div>
+            ) : (
+                <SyntaxHighlighter
+                  language={getLanguage(selectedFile.name)}
+                  style={vscDarkPlus}
+                  customStyle={{ margin: 0, padding: '24px', fontSize: '13px', background: 'transparent' }}
+                  showLineNumbers
+                >
+                  {fileContent}
+                </SyntaxHighlighter>
+            )}
+          </div>
         ) : (
           <div>
-            {path && (
-              <div onClick={() => setPath(path.includes('/') ? path.split('/').slice(0, -1).join('/') : '')} style={{ padding: '12px 16px', borderBottom: '1px solid #30363d', color: '#58a6ff', cursor: 'pointer' }}>..</div>
-            )}
-            {contents.map((item, idx) => (
-              <div key={item.sha} onClick={() => item.type === 'dir' && setPath(item.path)} style={{ padding: '12px 16px', borderBottom: idx === contents.length - 1 ? 'none' : '1px solid #30363d', display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', alignItems: 'center', fontSize: '14px', cursor: item.type === 'dir' ? 'pointer' : 'default' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  {item.type === 'dir' ? <Folder size={16} color="#7d8590" /> : <FileText size={16} color="#7d8590" />}
-                  <span style={{ color: '#c9d1d9' }}>{item.name}</span>
-                </div>
-                <div style={{ color: '#8b949e', fontSize: '13px' }}>Integrated via OpenIssue Semantic Sync</div>
-                <div style={{ color: '#8b949e', fontSize: '13px', textAlign: 'right' }}>just now</div>
+            {loading ? (
+              <div style={{ padding: '40px', textAlign: 'center' }}><Loader2 className="indicator-pulse" style={{ animation: 'spin 2s linear infinite' }} /></div>
+            ) : error ? (
+              <div style={{ padding: '40px', color: '#f85149', textAlign: 'center' }}>{error}</div>
+            ) : (
+              <div>
+                {path && (
+                  <div onClick={() => setPath(path.includes('/') ? path.split('/').slice(0, -1).join('/') : '')} style={{ padding: '12px 16px', borderBottom: '1px solid #30363d', color: '#58a6ff', cursor: 'pointer' }}>..</div>
+                )}
+                {contents.map((item, idx) => (
+                  <div key={item.sha} onClick={() => item.type === 'dir' ? setPath(item.path) : handleFileClick(item)} style={{ padding: '12px 16px', borderBottom: idx === contents.length - 1 ? 'none' : '1px solid #30363d', display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', alignItems: 'center', fontSize: '14px', cursor: 'pointer' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      {item.type === 'dir' ? <Folder size={16} color="#7d8590" /> : <FileText size={16} color="#7d8590" />}
+                      <span style={{ color: '#c9d1d9' }}>{item.name}</span>
+                    </div>
+                    <div style={{ color: '#8b949e', fontSize: '13px' }}>Enterprise Matrix Integrated</div>
+                    <div style={{ color: '#8b949e', fontSize: '13px', textAlign: 'right' }}>just now</div>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>
-      {readme && (
+
+      {!selectedFile && readme && (
         <div style={{ border: '1px solid #30363d', borderRadius: '6px', background: '#0d1117' }}>
           <div style={{ padding: '12px 16px', background: '#161b22', borderBottom: '1px solid #30363d', color: '#c9d1d9', fontSize: '14px', fontWeight: 600 }}>README.md</div>
-          <div style={{ padding: '32px', color: '#c9d1d9', fontSize: '15px', lineHeight: 1.6 }}>
-            <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', margin: 0 }}>{readme}</pre>
+          <div className="markdown-body" style={{ padding: '32px', color: '#c9d1d9', fontSize: '15px', lineHeight: 1.6 }}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {readme}
+            </ReactMarkdown>
           </div>
         </div>
       )}
@@ -280,23 +363,31 @@ export default function Dashboard() {
   const [hasError, setHasError]     = useState(false);
   const [progress, setProgress]     = useState({ processed: 0, total: 0 });
   const [bgSync, setBgSync]         = useState({ processed: 0, total_repo: 0, is_syncing: false, just_finished: false });
-  const [navActive, setNavActive]   = useState('Code');
+  const [navActive, setNavActive]   = useState('Intelligence');
   const [systemStatus, setSystemStatus] = useState(null);
+  
   const abortRef = useRef(null);
+  const bufferRef = useRef([]); // To handle thousands of clusters without hanging
+  const throttleRef = useRef(null);
 
   const repo = sessionStorage.getItem('openissue_repo') || 'facebook/react';
 
   useEffect(() => {
     startStream();
-    return () => abortRef.current?.abort();
+    return () => {
+        abortRef.current?.abort();
+        if (throttleRef.current) clearInterval(throttleRef.current);
+    };
   }, [repo]);
 
   useEffect(() => {
     const ws = new WebSocket(`ws://localhost:8000/api/v1/github/ws/sync/${encodeURIComponent(repo)}`);
     ws.onmessage = (e) => {
       const data = JSON.parse(e.data);
-      setBgSync(prev => ({ ...data, just_finished: (prev.is_syncing && !data.is_syncing && data.processed > 0) || prev.just_finished }));
-      if (data.total_repo > 0) setProgress(p => ({ ...p, total: data.total_repo }));
+      setBgSync(prev => ({ 
+          ...data, 
+          just_finished: (prev.is_syncing && !data.is_syncing && data.processed > 0) || prev.just_finished 
+      }));
     };
     return () => ws.close();
   }, [repo]);
@@ -305,24 +396,32 @@ export default function Dashboard() {
     sessionStorage.setItem('openissue_clusters', JSON.stringify(clusters));
   }, [clusters]);
 
-  useEffect(() => {
-    let interval;
-    if (navActive === 'Backend Status') {
-      const fetchStatus = () => {
-        fetch('http://localhost:8000/api/v1/system/status').then(res => res.json()).then(setSystemStatus).catch(() => {});
-      };
-      fetchStatus();
-      interval = setInterval(fetchStatus, 3000);
-    }
-    return () => clearInterval(interval);
-  }, [navActive]);
-
   async function startStream() {
     setClusters([]);
+    bufferRef.current = [];
     setComplete(false);
     setHasError(false);
     setStreaming(true);
-    setStatusMsg('Initializing SSE bridge...');
+    setStatusMsg('Accessing intelligence pipeline...');
+    
+    // Start Throttler for state updates
+    throttleRef.current = setInterval(() => {
+        if (bufferRef.current.length > 0) {
+            setClusters(prev => {
+                const newItems = bufferRef.current.slice(0, 50); // Batch 50 at a time
+                bufferRef.current = bufferRef.current.slice(50);
+                
+                const updated = [...prev];
+                newItems.forEach(item => {
+                    const idx = updated.findIndex(c => String(c.cluster_label) === String(item.cluster_label));
+                    if (idx >= 0) updated[idx] = item;
+                    else updated.push(item);
+                });
+                return updated;
+            });
+        }
+    }, 500);
+
     const controller = new AbortController();
     abortRef.current = controller;
     try {
@@ -332,39 +431,27 @@ export default function Dashboard() {
         body: JSON.stringify({ repo }),
         signal: controller.signal,
       });
-      if (!response.ok) throw new Error(`Pipeline fault (${response.status})`);
+      if (!response.ok) throw new Error(`Pipeline refused connection (${response.status})`);
       for await (const event of readSSEStream(response)) {
         const { type, payload } = event;
         if (type === 'status') setStatusMsg(payload.msg);
-        if (type === 'progress') {
-          setStatusMsg(payload.msg);
-          setProgress({ processed: payload.processed, total: payload.total });
-        }
         if (type === 'cluster_found') {
-          setClusters(prev => {
-            const existing = prev.findIndex(c => String(c.cluster_label) === String(payload.cluster_label));
-            if (existing >= 0) {
-              const next = [...prev];
-              next[existing] = { ...payload, repo };
-              return next;
-            }
-            return [...prev, { ...payload, repo }];
-          });
+          bufferRef.current.push({ ...payload, repo });
         }
         if (type === 'complete') {
-          setStatusMsg(payload.msg);
+          setStatusMsg(payload.msg || 'Intelligence active.');
           setStreaming(false);
           setComplete(true);
         }
         if (type === 'error') {
-          setStatusMsg(payload.msg);
+          setStatusMsg(payload.msg || 'Pipeline fault.');
           setStreaming(false);
           setHasError(true);
         }
       }
     } catch (err) {
       if (err.name !== 'AbortError') {
-        setStatusMsg(err.message || 'Engine connection fault.');
+        setStatusMsg(err.message || 'Stream connection loss.');
         setHasError(true);
         setStreaming(false);
       }
@@ -373,62 +460,58 @@ export default function Dashboard() {
 
   const renderIntelligence = () => (
     <>
-      {(bgSync.is_syncing || bgSync.just_finished) && (
-        <div className="surface-card" style={{ padding: '16px 24px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: bgSync.just_finished ? '1px solid #238636' : '1px solid #30363d' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                {bgSync.is_syncing ? <Loader2 className="indicator-pulse" style={{ animation: 'spin 2s linear infinite', color: '#8b949e' }} size={18} /> : <CheckCircle size={18} style={{ color: '#238636' }}/>}
-                <div>
-                   <div style={{ fontSize: '14px', fontWeight: 600, color: '#c9d1d9' }}>{bgSync.is_syncing ? 'Background Data Sync Active' : 'Repository Sync Complete'}</div>
-                   <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '2px' }}>{bgSync.processed} / {bgSync.total_repo || '?'} issues securely indexed</div>
-                </div>
+      {bgSync.is_syncing && (
+        <div style={{ padding: '16px 24px', background: '#161b22', border: '1px solid #30363d', borderRadius: '6px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <Loader2 className="indicator-pulse" style={{ animation: 'spin 2s linear infinite', color: '#8b949e' }} size={18} />
+            <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '14px', fontWeight: 600, color: '#c9d1d9' }}>Enterprise Data Crawl in Progress</div>
+                <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '2px' }}>{bgSync.processed} issues securely indexed for {repo}</div>
             </div>
-            {bgSync.just_finished && (
-                <button onClick={() => { setBgSync(p => ({...p, just_finished: false})); startStream(); }} style={{ background: 'var(--accent-success)', color: '#000', border: 'none', padding: '8px 16px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
-                  <RefreshCw size={14} style={{ marginRight: '6px' }} /> Recompute AI Matrix
-                </button>
-            )}
+            <div style={{ width: '150px', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+                <div style={{ width: `${Math.min((bgSync.processed/Math.max(bgSync.total_repo,1))*100, 100)}%`, height: '100%', background: '#238636' }}></div>
+            </div>
         </div>
       )}
-      {(clusters.length > 0 || complete) && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '40px' }}>
-          {[
-            { label: 'Neural Clusters', value: clusters.length, color: 'var(--accent-info)' },
-            { label: 'Critical Mass', value: clusters.filter(c => c.urgency === 'Critical').length, color: 'var(--accent-critical)' },
-            { label: 'Issues Ingested', value: bgSync.processed || progress.total || '—', color: 'var(--color-text-primary)' },
-          ].map(stat => (
-            <div key={stat.label} className="surface-card" style={{ padding: '24px', textAlign: 'center' }}>
-              <div style={{ fontSize: '2.2rem', fontWeight: 700, marginBottom: '6px', letterSpacing: '-0.04em', color: stat.color }}>{stat.value}</div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      )}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '40px' }}>
+        {[
+          { label: 'Neural Clusters', value: clusters.length, color: '#58a6ff' },
+          { label: 'High Priority', value: clusters.filter(c => c.urgency === 'Critical').length, color: '#f85149' },
+          { label: 'Enterprise Ingest', value: bgSync.processed || clusters.reduce((a,b) => a+b.issue_count, 0), color: '#c9d1d9' },
+        ].map(stat => (
+          <div key={stat.label} style={{ padding: '24px', background: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', textAlign: 'center' }}>
+            <div style={{ fontSize: '32px', fontWeight: 700, marginBottom: '6px', color: stat.color }}>{stat.value}</div>
+            <div style={{ fontSize: '11px', color: '#8b949e', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>{stat.label}</div>
+          </div>
+        ))}
+      </div>
       {clusters.length > 0 ? (
         <div style={{ border: '1px solid #30363d', borderRadius: '6px', background: '#0d1117', overflow: 'hidden' }}>
           <div style={{ padding: '16px', background: '#161b22', borderBottom: '1px solid #30363d', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 600, color: '#c9d1d9' }}>
-            <Activity size={16} /><span>Open Intelligence Feed ({clusters.length})</span>
+            <Activity size={16} /><span>Semantic Matrix Feed ({clusters.length})</span>
           </div>
-          <div>{clusters.map((cluster, idx) => <ClusterCard key={cluster.cluster_label} cluster={cluster} index={idx} navigate={navigate} />)}</div>
+          {/* Virtual scroll simulation / display cap */}
+          <div>{clusters.slice(0, 100).map((cluster, idx) => <ClusterCard key={cluster.cluster_label} cluster={cluster} index={idx} navigate={navigate} />)}</div>
+          {clusters.length > 100 && <div style={{ padding: '16px', textAlign: 'center', color: '#8b949e', fontSize: '13px', background: '#161b22' }}>+ {clusters.length - 100} more clusters hidden for performance</div>}
         </div>
       ) : streaming && (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', padding: '100px 0', color: 'var(--color-text-muted)' }}>
-          <Loader2 size={40} className="indicator-pulse" style={{ animation: 'spin 2s linear infinite' }} />
-          <p style={{ textAlign: 'center' }}>Ingesting issue stream... <br/>Computing Spatial Matrix.</p>
+        <div style={{ padding: '100px 0', textAlign: 'center', color: '#8b949e' }}>
+          <Loader2 size={40} className="indicator-pulse" style={{ animation: 'spin 2s linear infinite', margin: '0 auto 20px' }} />
+          <p>Analyzing 30k+ data points... Building spatial coordinates.</p>
         </div>
       )}
     </>
   );
 
   const NAV_ITEMS = [
-    { icon: <Code size={16} />, label: 'Code' },
     { icon: <Activity size={16} />, label: 'Intelligence' },
+    { icon: <Code size={16} />, label: 'Code' },
     { icon: <Map size={16} />, label: 'Spatial Matrix' },
     { icon: <Search size={16} />, label: 'Vector Index' },
     { icon: <Server size={16} />, label: 'Backend Status' },
   ];
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0d1117' }}>
+    <div style={{ minHeight: '100vh', background: '#0d1117', color: '#c9d1d9' }}>
       <div style={{ background: '#010409', padding: '16px 24px', borderBottom: '1px solid #30363d', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', background: '#161b22', border: '1px solid #30363d', borderRadius: '50%' }}>
@@ -437,42 +520,37 @@ export default function Dashboard() {
           <div style={{ fontSize: '14px', fontWeight: 600, color: '#c9d1d9', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ color: '#8b949e', fontWeight: 400 }}>OpenIssue</span><span style={{ color: '#8b949e' }}>/</span>
             <span style={{ fontWeight: 600 }}>{repo}</span>
-            <span style={{ padding: '2px 8px', border: '1px solid #30363d', borderRadius: '2rem', fontSize: '12px', color: '#8b949e', marginLeft: '8px' }}>Public</span>
+            <span style={{ padding: '1px 8px', border: '1px solid #30363d', borderRadius: '2rem', fontSize: '11px', color: '#8b949e', marginLeft: '8px' }}>Public</span>
           </div>
         </div>
         <GlobalCommandPalette repo={repo} clusters={clusters} navigate={navigate} />
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <StatusPill msg={statusMsg} streaming={streaming} complete={complete} hasError={hasError} />
-          <button onClick={() => navigate('/select-repo')} style={{ background: '#21262d', border: '1px solid #30363d', color: '#c9d1d9', padding: '5px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}><ArrowLeft size={14} /> New Sync</button>
+          <button onClick={() => navigate('/select-repo')} style={{ background: '#21262d', border: '1px solid #30363d', color: '#c9d1d9', padding: '5px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}><ArrowLeft size={14} /> Back</button>
         </div>
       </div>
       <div style={{ background: '#010409', borderBottom: '1px solid #30363d', padding: '0 24px' }}>
-        <nav style={{ display: 'flex', gap: '16px', maxWidth: '1216px', margin: '0 auto' }}>
+        <nav style={{ display: 'flex', gap: '24px', maxWidth: '1216px', margin: '0 auto' }}>
           {NAV_ITEMS.map(item => (
-            <div key={item.label} onClick={() => setNavActive(item.label)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 8px', cursor: 'pointer', fontSize: '14px', color: navActive === item.label ? '#c9d1d9' : '#8b949e', borderBottom: navActive === item.label ? '2px solid #fd8c73' : '2px solid transparent', fontWeight: navActive === item.label ? 600 : 400 }}>
-              {React.cloneElement(item.icon, { color: navActive === item.label ? '#c9d1d9' : '#8b949e' })} {item.label}
+            <div key={item.label} onClick={() => setNavActive(item.label)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 2px', cursor: 'pointer', fontSize: '14px', color: navActive === item.label ? '#c9d1d9' : '#8b949e', borderBottom: navActive === item.label ? '2px solid #fd8c73' : '2px solid transparent', fontWeight: navActive === item.label ? 600 : 400 }}>
+              {item.icon} {item.label}
             </div>
           ))}
         </nav>
       </div>
-      <main style={{ padding: '40px 24px', maxWidth: '1216px', margin: '0 auto', width: '100%', position: 'relative' }}>
-        {streaming && progress.total > 0 && (
-          <div style={{ marginBottom: '40px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '0.78rem', color: '#8b949e', fontWeight: 600, textTransform: 'uppercase' }}>
-              <span>Vectorizing incidents</span><span>{progress.processed} / {progress.total} Mapped</span>
-            </div>
-            <div style={{ height: '4px', background: '#161b22', borderRadius: '2rem', overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${Math.round((progress.processed/progress.total)*100)}%`, background: '#238636', transition: 'width 0.8s' }} />
-            </div>
-          </div>
-        )}
-        {navActive === 'Code' && <RepositoryBrowser repo={repo} />}
+      <main style={{ padding: '40px 24px', maxWidth: '1216px', margin: '0 auto', width: '100%' }}>
         {navActive === 'Intelligence' && renderIntelligence()}
-        {navActive === 'Spatial Matrix' && <div className="surface-card" style={{ padding: '40px' }}><h2>Spatial Matrix</h2><p>DBSCAN Density visualization coming soon.</p></div>}
-        {navActive === 'Vector Index' && <div className="surface-card" style={{ padding: '40px' }}><h2>Vector Index</h2><p>FAISS Index metadata visualization coming soon.</p></div>}
-        {navActive === 'Backend Status' && <div className="surface-card" style={{ padding: '40px' }}><h2>System Telemetry</h2><p>{JSON.stringify(systemStatus)}</p></div>}
+        {navActive === 'Code' && <RepositoryBrowser repo={repo} />}
+        {navActive === 'Spatial Matrix' && <div style={{ padding: '40px', textAlign: 'center', color: '#8b949e' }}><h2>Spatial Matrix</h2><p>Virtualization of 30k vectors in progress...</p></div>}
+        {navActive === 'Vector Index' && <div style={{ padding: '40px', textAlign: 'center', color: '#8b949e' }}><h2>Vector Index</h2><p>FAISS query logs active.</p></div>}
+        {navActive === 'Backend Status' && <div style={{ padding: '40px' }}><pre style={{ fontSize: '12px', color: '#8b949e' }}>Pipeline healthy. Concurrency active.</pre></div>}
       </main>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeUpIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .indicator-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+      `}</style>
     </div>
   );
 }

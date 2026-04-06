@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ExternalLink, ShieldAlert, Zap, Loader2, GitPullRequestDraft } from 'lucide-react';
+import { ArrowLeft, ExternalLink, ShieldAlert, Zap, Loader2, GitPullRequestDraft, MessageSquare } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function ClusterDetail() {
   const { id } = useParams();
@@ -36,7 +38,7 @@ export default function ClusterDetail() {
       issue_count: 0,
       repo: sessionStorage.getItem('openissue_repo') || 'unknown/repo',
       github_issue_numbers: [],
-      llm_summary: "Please return to the Dashboard and ensure the Intelligence Stream is active. The semantic matrix requires a warm cache to display cluster topologies.",
+      llm_summary: "The semantic matrix requires a warm cache to display cluster topologies. Please return to the Dashboard.",
       similarity_score: "N/A",
     });
     setLoading(false);
@@ -44,9 +46,9 @@ export default function ClusterDetail() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--color-base)' }}>
-        <Loader2 size={40} className="indicator-pulse" style={{ animation: 'spin 2s linear infinite', color: 'var(--accent-info)', marginBottom: '20px' }} />
-        <h2 style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>Decrypting Dimensional Cluster {id}...</h2>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#0d1117' }}>
+        <Loader2 size={40} className="indicator-pulse" style={{ animation: 'spin 2s linear infinite', color: '#58a6ff', marginBottom: '20px' }} />
+        <h2 style={{ color: '#8b949e', fontWeight: 500 }}>Decrypting Dimensional Cluster {id}...</h2>
       </div>
     );
   }
@@ -54,34 +56,36 @@ export default function ClusterDetail() {
   const isCritical = clusterInfo?.urgency === 'Critical';
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--color-base)', padding: '40px 60px' }}>
+    <div style={{ minHeight: '100vh', background: '#0d1117', padding: '40px 60px', color: '#c9d1d9' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
         
         {/* Navigation & Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '40px' }}>
           <button 
             onClick={() => navigate('/dashboard')}
-            className="anim-base"
             style={{ 
-              background: 'rgba(255,255,255,0.05)', 
-              border: 'var(--border-subtle)', 
+              background: '#161b22', 
+              border: '1px solid #30363d', 
               padding: '10px', 
-              borderRadius: 'var(--radius-sm)',
+              borderRadius: '6px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              color: '#c9d1d9'
             }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = '#8b949e'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = '#30363d'}
           >
-            <ArrowLeft size={18} color="var(--color-text-secondary)" />
+            <ArrowLeft size={18} />
           </button>
           <div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: 600, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <h1 style={{ fontSize: '24px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px', margin: 0 }}>
               Cluster Identity #{clusterInfo.cluster_label}
               <span style={{ 
-                fontSize: '14px', 
-                padding: '4px 10px', 
-                background: '#238636', 
+                fontSize: '12px', 
+                padding: '2px 10px', 
+                background: isCritical ? '#f85149' : '#238636', 
                 borderRadius: '20px',
                 color: '#fff',
                 fontWeight: 600
@@ -90,7 +94,7 @@ export default function ClusterDetail() {
               </span>
               <span style={{ 
                 fontSize: '12px', 
-                padding: '3px 8px', 
+                padding: '2px 8px', 
                 border: '1px solid #30363d',
                 borderRadius: '20px',
                 color: '#8b949e',
@@ -102,41 +106,43 @@ export default function ClusterDetail() {
         </div>
 
         {/* Top Info Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 250px', gap: '24px', marginBottom: '24px' }}>
-          <div className="surface-card stagger-1" style={{ padding: '32px', borderLeft: isCritical ? '4px solid #f85149' : '4px solid #58a6ff' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '24px', marginBottom: '24px' }}>
+          <div style={{ padding: '32px', background: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', borderLeft: isCritical ? '6px solid #f85149' : '6px solid #58a6ff' }}>
              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', color: isCritical ? '#f85149' : '#58a6ff', fontSize: '13px', fontWeight: 600, textTransform: 'uppercase' }}>
                {isCritical ? <ShieldAlert size={16} /> : <Zap size={16} />}
                {clusterInfo.urgency} Discovery
              </div>
-             <h2 style={{ fontSize: '20px', fontWeight: 500, lineHeight: 1.4, color: '#c9d1d9' }}>
+             <h2 style={{ fontSize: '20px', fontWeight: 500, lineHeight: 1.4, color: '#c9d1d9', margin: 0 }}>
                {clusterInfo.insight}
              </h2>
           </div>
 
-          <div className="surface-card stagger-2" style={{ padding: '32px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ padding: '32px', background: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <div style={{ color: '#8b949e', fontSize: '12px', textTransform: 'uppercase', fontWeight: 600, marginBottom: '8px' }}>
               Issue Volume
             </div>
             <div style={{ fontSize: '3rem', fontWeight: 700, lineHeight: 1, color: isCritical ? '#f85149' : '#c9d1d9' }}>
               {clusterInfo.issue_count}
             </div>
-            <div style={{ marginTop: '12px', fontSize: '0.85rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <GitPullRequestDraft size={14} /> Similar tickets merged
+            <div style={{ marginTop: '12px', fontSize: '12px', color: '#8b949e', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <GitPullRequestDraft size={14} /> Neural group priority
             </div>
           </div>
         </div>
 
         {/* Detailed Insights & Issues */}
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 300px', gap: '24px' }}>
-          <div className="surface-card stagger-3" style={{ padding: '32px' }}>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '24px', fontWeight: 600 }}>LLM Deep Analysis</h3>
-            <p style={{ fontSize: '1rem', lineHeight: 1.7, color: 'var(--color-text-secondary)' }}>
-              {clusterInfo.llm_summary}
-            </p>
+          <div style={{ padding: '32px', background: '#0d1117', border: '1px solid #30363d', borderRadius: '6px' }}>
+            <h3 style={{ fontSize: '16px', marginBottom: '24px', fontWeight: 600, color: '#c9d1d9' }}>AI Content Analysis</h3>
+            <div className="markdown-body" style={{ fontSize: '15px', lineHeight: 1.7, color: '#c9d1d9' }}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {clusterInfo.llm_summary}
+              </ReactMarkdown>
+            </div>
 
-            <h3 style={{ fontSize: '1.1rem', margin: '40px 0 24px 0', fontWeight: 600 }}>Affected Issues</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {clusterInfo.github_issue_numbers.map((num, idx) => (
+            <h3 style={{ fontSize: '16px', margin: '40px 0 16px 0', fontWeight: 600, color: '#c9d1d9' }}>Incidents in Cluster</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {(clusterInfo.github_issue_numbers || []).map((num, idx) => (
                 <a 
                   key={`${num}-${idx}`}
                   href={`https://github.com/${clusterInfo.repo}/issues/${num}`}
@@ -146,37 +152,38 @@ export default function ClusterDetail() {
                     display: 'flex', 
                     alignItems: 'center', 
                     justifyContent: 'space-between',
-                    padding: '16px', 
+                    padding: '12px 16px', 
                     background: '#161b22', 
                     border: '1px solid #30363d',
                     borderRadius: '6px',
                     textDecoration: 'none',
                     color: '#c9d1d9',
-                    transition: 'border-color 0.2s'
+                    fontSize: '14px',
+                    transition: 'background-color 0.2s'
                   }}
-                  onMouseEnter={e => e.currentTarget.style.borderColor = '#8b949e'}
-                  onMouseLeave={e => e.currentTarget.style.borderColor = '#30363d'}
+                  onMouseEnter={e => e.currentTarget.style.background = '#21262d'}
+                  onMouseLeave={e => e.currentTarget.style.background = '#161b22'}
                 >
                   <span style={{ fontWeight: 500 }}>Issue #{num}</span>
-                  <ExternalLink size={16} color="#8b949e" />
+                  <ExternalLink size={14} color="#8b949e" />
                 </a>
               ))}
             </div>
           </div>
 
           {/* Sidebar Metrics */}
-          <div className="stagger-4" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-             <div className="surface-card" style={{ padding: '24px' }}>
-               <h4 style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '16px' }}>Core Metrics</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+             <div style={{ padding: '24px', background: '#0d1117', border: '1px solid #30363d', borderRadius: '6px' }}>
+               <h4 style={{ fontSize: '11px', color: '#8b949e', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '16px', fontWeight: 600 }}>Core Matrics</h4>
                
                <div style={{ marginBottom: '16px' }}>
-                 <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>Internal Similarity</div>
-                 <div style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--accent-info)' }}>{clusterInfo.similarity_score}</div>
+                 <div style={{ fontSize: '12px', color: '#8b949e', marginBottom: '4px' }}>Cluster Cohesion</div>
+                 <div style={{ fontSize: '20px', fontWeight: 600, color: '#58a6ff' }}>{clusterInfo.similarity_score}</div>
                </div>
 
                <div>
-                 <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>Resolution Priority</div>
-                 <div style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>P-1</div>
+                 <div style={{ fontSize: '12px', color: '#8b949e', marginBottom: '4px' }}>Resolution Priority</div>
+                 <div style={{ fontSize: '20px', fontWeight: 600, color: isCritical ? '#f85149' : '#c9d1d9' }}>{isCritical ? 'P-0' : 'P-1'}</div>
                </div>
              </div>
           </div>
@@ -184,7 +191,8 @@ export default function ClusterDetail() {
 
       </div>
       <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+        .indicator-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
       `}</style>
     </div>
   );
