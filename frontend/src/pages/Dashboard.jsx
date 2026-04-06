@@ -54,3 +54,11 @@ function StatusPill({ msg, streaming, complete, hasError }) {
     </div>
   );
 }
+
+function ClusterCard({ cluster, index }) {
+  const isCritical = cluster.urgency === 'Critical';
+  return (
+    <div
+      className="surface-card interactive"
+      style={{
+        position: 'relative',
