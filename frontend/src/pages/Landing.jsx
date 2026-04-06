@@ -22,3 +22,11 @@ export default function Landing() {
         position: 'absolute', top: '-10%', left: '-10%', width: '40%', height: '40%',
         background: 'radial-gradient(circle, rgba(59,130,246,0.05) 0%, transparent 70%)',
         filter: 'blur(80px)', pointerEvents: 'none'
+      }} />
+      <div style={{
+        position: 'absolute', bottom: '-10%', right: '-10%', width: '50%', height: '50%',
+        background: 'radial-gradient(circle, rgba(139,92,246,0.05) 0%, transparent 70%)',
+        filter: 'blur(100px)', pointerEvents: 'none'
+      }} />
+
+      <div className="stagger-1" style={{ 
