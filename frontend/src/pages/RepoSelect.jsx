@@ -40,3 +40,9 @@ export default function RepoSelect() {
     // Persist repo slug for Dashboard to consume
     sessionStorage.setItem('openissue_repo', repo.trim());
     setTimeout(() => navigate('/dashboard'), 600);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') handleSync();
+  };
+
