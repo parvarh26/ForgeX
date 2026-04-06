@@ -46,3 +46,11 @@ export default function Landing() {
         <Zap size={14} color="var(--color-text-primary)" />
         OpenIssue Intelligence Engine
       </div>
+
+      <h1 className="stagger-2" style={{
+        fontSize: '4.5rem',
+        fontWeight: 700,
+        letterSpacing: '-0.05em',
+        textAlign: 'center',
+        lineHeight: '1',
+        maxWidth: '900px',
