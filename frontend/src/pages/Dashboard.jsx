@@ -326,3 +326,11 @@ export default function Dashboard() {
 
   const renderSystemStatus = () => (
     <div className="surface-card stagger-1" style={{ padding: '40px' }}>
+      <h2 style={{ marginBottom: '32px' }}>System Telemetry</h2>
+      {systemStatus ? (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+          <div className="surface-card" style={{ padding: '20px', background: 'rgba(255,255,255,0.02)' }}>
+            <div style={{ color: 'var(--color-text-muted)', fontSize: '0.7rem', textTransform: 'uppercase', marginBottom: '8px' }}>CPU Load</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>{systemStatus.telemetry.cpu}%</div>
+          </div>
+          <div className="surface-card" style={{ padding: '20px', background: 'rgba(255,255,255,0.02)' }}>
