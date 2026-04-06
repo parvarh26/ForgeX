@@ -34,3 +34,12 @@ class ClusterModel(Base):
     urgency = Column(String)
 
 # Init DB — runs at import time to ensure schema is always current
+Base.metadata.create_all(bind=engine)
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
