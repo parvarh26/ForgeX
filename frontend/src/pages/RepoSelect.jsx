@@ -52,3 +52,9 @@ export default function RepoSelect() {
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
+      alignItems: 'center',
+      padding: '80px 24px',
+      background: 'radial-gradient(circle at center, #0a0a0a 0%, #000000 100%)',
+      overflow: 'hidden'
+    }}>
+
