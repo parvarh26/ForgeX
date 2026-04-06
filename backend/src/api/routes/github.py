@@ -233,3 +233,6 @@ async def sync_repository(request: SyncRequest, background_tasks: BackgroundTask
         headers={
             "Cache-Control": "no-cache",
             "X-Accel-Buffering": "no",
+            "Connection": "keep-alive",
+        }
+    )
