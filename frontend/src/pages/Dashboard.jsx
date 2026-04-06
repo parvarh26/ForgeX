@@ -158,3 +158,11 @@ function ClusterCard({ cluster, index }) {
 // ── Main Dashboard ────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+  const [clusters, setClusters]     = useState([]);
+  const [statusMsg, setStatusMsg]   = useState('');
+  const [streaming, setStreaming]   = useState(false);
+  const [complete, setComplete]     = useState(false);
+  const [hasError, setHasError]     = useState(false);
+  const [progress, setProgress]     = useState({ processed: 0, total: 0 });
+  const [navActive, setNavActive]   = useState('Intelligence');
