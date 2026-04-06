@@ -38,3 +38,11 @@ def create_app() -> FastAPI:
         # Dependency Injection of singletons mapped to routers
         issues.v_store = VectorStore(dimension=embedder.dimension)
         log.info("Vector Store dynamically linked.")
+
+    @app.get("/health")
+    def health_check():
+        return {"status": "ok", "environment": settings.ENVIRONMENT}
+
+    return app
+
+app = create_app()
