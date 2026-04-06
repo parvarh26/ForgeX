@@ -262,3 +262,11 @@ export default function Dashboard() {
             { label: 'Neural Clusters', value: clusters.length, color: 'var(--accent-info)' },
             { label: 'Critical Mass', value: clusters.filter(c => c.urgency === 'Critical').length, color: 'var(--accent-critical)' },
             { label: 'Issues Ingested', value: progress.total || '—', color: 'var(--color-text-primary)' },
+          ].map(stat => (
+            <div key={stat.label} className="surface-card" style={{ padding: '24px', textAlign: 'center' }}>
+              <div style={{ fontSize: '2.2rem', fontWeight: 700, marginBottom: '6px', letterSpacing: '-0.04em', color: stat.color }}>{stat.value}</div>
+              <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      )}
