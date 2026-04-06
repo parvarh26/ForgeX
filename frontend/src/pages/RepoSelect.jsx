@@ -112,3 +112,9 @@ export default function RepoSelect() {
           color: 'var(--color-text-muted)', 
           marginBottom: '12px', 
           letterSpacing: '0.1em', 
+          textTransform: 'uppercase' 
+        }}>
+          GitHub Slug / Repository
+        </label>
+
+        <div style={{ position: 'relative', marginBottom: '8px' }}>
