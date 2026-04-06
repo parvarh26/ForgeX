@@ -278,3 +278,11 @@ export default function Dashboard() {
         </div>
       ) : streaming && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', padding: '100px 0', color: 'var(--color-text-muted)' }}>
+          <Loader2 size={40} className="indicator-pulse" style={{ animation: 'spin 2s linear infinite' }} />
+          <p style={{ fontSize: '1rem', maxWidth: '400px', textAlign: 'center', lineHeight: 1.6 }}>Ingesting issue stream... <br/>Spatial Matrix is being computed.</p>
+        </div>
+      )}
+    </>
+  );
+
+  const renderSpatialMatrix = () => (
