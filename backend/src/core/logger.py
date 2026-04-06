@@ -14,3 +14,7 @@ def setup_logger(name: str) -> logging.Logger:
     
     if not logger.handlers:
         logger.addHandler(handler)
+        
+    return logger
+
+log = setup_logger("openissue.core")
