@@ -106,3 +106,9 @@ export default function RepoSelect() {
       }}>
 
         <label style={{ 
+          display: 'block', 
+          fontSize: '0.7rem', 
+          fontWeight: 600,
+          color: 'var(--color-text-muted)', 
+          marginBottom: '12px', 
+          letterSpacing: '0.1em', 
