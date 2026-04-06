@@ -82,3 +82,9 @@ export default function RepoSelect() {
         background: 'rgba(255,255,255,0.03)',
         border: 'var(--border-subtle)',
         borderRadius: 'var(--radius-pill)',
+      }}>
+        <Zap size={13} color="var(--color-text-primary)" />
+        Intelligence Gateway
+      </div>
+
+      <div className="stagger-1" style={{ textAlign: 'center', marginBottom: '48px' }}>
