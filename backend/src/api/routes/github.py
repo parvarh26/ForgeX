@@ -48,3 +48,8 @@ async def _stream_intelligence(repo: str, db: Session):
         # ── SCORCHED EARTH: wipe old tenant data ───────────────────────────────
         deleted_i, deleted_c = scorched_earth_for_repo(db, repo)
         log.info(f"Scorched-earth complete: removed {deleted_i} issues, {deleted_c} clusters for '{repo}'")
+        yield _sse_event({
+            "type": "status",
+            "payload": {"msg": f"Tenant namespace cleared. Fetching live issues from github.com/{repo}..."}
+        })
+
