@@ -148,3 +148,13 @@ curl http://localhost:8000/health
 
 # SSE sync endpoint (requires GitHub token or public repo)
 curl -N -X POST http://localhost:8000/api/v1/github/sync \
+  -H "Content-Type: application/json" \
+  -d '{"repo": "facebook/react"}' 
+# Should stream cluster_found events
+```
+
+### Manual
+1. Land on `/` → click "Sign in with GitHub" → auto-advances to `/select-repo`
+2. Type `facebook/react` and hover sync button (connection warms)
+3. Click → navigate to `/dashboard`
+4. Watch cluster cards stream in live as DBSCAN identifies topological boundaries
