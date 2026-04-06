@@ -52,3 +52,12 @@ class VectorStore:
             log.error(f"FAISS search failed: {e}")
             return []
 
+    def get_all_vectors(self):
+        """Used for clustering engine"""
+        if self.index.ntotal == 0:
+            return np.empty((0, self.dimension)), []
+        
+        # Reconstruct vectors (IndexFlatIP supports this for small sets)
+        vectors = np.array([self.index.reconstruct(i) for i in range(self.index.ntotal)])
+        return vectors, self.id_map
+
