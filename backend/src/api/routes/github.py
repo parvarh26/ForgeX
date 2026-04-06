@@ -223,3 +223,8 @@ async def sync_repository(request: SyncRequest, background_tasks: BackgroundTask
     2. Background crawl for the full repository (Long-term Cache).
     """
     log.info(f"SSE sync initiated for repo: {request.repo}")
+
+    from src.db.models import SessionLocal
+    background_tasks.add_task(background_crawl, request.repo, SessionLocal)
+
+    return StreamingResponse(
