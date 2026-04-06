@@ -94,3 +94,9 @@ export default function RepoSelect() {
         <p style={{ color: 'var(--color-text-secondary)', fontSize: '1rem', maxWidth: '440px', lineHeight: 1.5 }}>
           Specify a public GitHub workspace to begin real-time vectorization and recursive clustering.
         </p>
+      </div>
+
+      {/* Input container */}
+      <div className="surface-card stagger-2" style={{
+        width: '100%',
+        maxWidth: '520px',
