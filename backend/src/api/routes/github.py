@@ -188,3 +188,8 @@ async def background_crawl(repo: str, db_factory):
     log.info(f"Background crawl started for {repo}")
     # We use a fresh session because the request session will be closed
     db = db_factory()
+    try:
+        # Fetch a larger batch (e.g., 500 more) to populate the cache
+        additional_issues = await github_service.fetch_issues(repo, limit=600)
+        for raw in additional_issues:
+            # Check if exists to avoid duplicates
