@@ -124,3 +124,9 @@ export default function RepoSelect() {
             pointerEvents: 'none'
           }} />
           <input
+            id="repo-input"
+            type="text"
+            value={repo}
+            onChange={e => { setRepo(e.target.value); setError(''); warmRef.current = false; }}
+            onKeyDown={handleKeyDown}
+            placeholder="owner/repo"
