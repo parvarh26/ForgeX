@@ -34,3 +34,12 @@ class LLMService:
         Falls back to mock heuristic if LLM provider is 'mock' or no API key.
         """
         if not context_texts:
+            return "Unable to determine trend context."
+
+        keywords = self._extract_keywords(context_texts)
+        keyword_str = ", ".join(keywords) if keywords else "recurring pattern"
+
+        if self.provider == "mock" or not settings.LLM_API_KEY:
+            # Deterministic insight derived from real extracted text
+            combined = " ".join(context_texts).lower()
+
