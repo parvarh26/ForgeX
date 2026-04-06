@@ -19,3 +19,10 @@ async def ingest_issue(issue: IssueCreate, background_tasks: BackgroundTasks, db
     
     log.info(f"Ingesting new issue: {issue.title}")
     
+    # 1. Save to DB immediately (speed layer)
+    db_issue = IssueModel(title=issue.title, body=issue.body)
+    db.add(db_issue)
+    db.commit()
+    db.refresh(db_issue)
+    
+    # 2. NLP Pipeline
