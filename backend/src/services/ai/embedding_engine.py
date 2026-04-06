@@ -43,3 +43,8 @@ class EmbeddingEngine:
                 normalized.append(v / norm if norm > 0 else v)
             return normalized
         except Exception as e:
+            log.error(f"Batch embedding failed: {e}")
+            raise
+
+# Singleton instance for the workers to use
+engine = EmbeddingEngine()
