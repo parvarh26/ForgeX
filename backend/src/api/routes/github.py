@@ -43,3 +43,8 @@ async def _stream_intelligence(repo: str, db: Session):
         yield _sse_event({
             "type": "status",
             "payload": {"msg": f"Pipeline initialized for {repo}. Booting intelligence layers..."}
+        })
+
+        # ── SCORCHED EARTH: wipe old tenant data ───────────────────────────────
+        deleted_i, deleted_c = scorched_earth_for_repo(db, repo)
+        log.info(f"Scorched-earth complete: removed {deleted_i} issues, {deleted_c} clusters for '{repo}'")
