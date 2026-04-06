@@ -358,3 +358,11 @@ export default function Dashboard() {
   ];
 
   const progressPct = progress.total > 0 ? Math.round((progress.processed / progress.total) * 100) : 0;
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', minHeight: '100vh', background: 'var(--color-base)' }}>
+      <aside style={{ borderRight: 'var(--border-subtle)', padding: '32px 24px', display: 'flex', flexDirection: 'column', background: 'rgba(5,5,5,0.4)', backdropFilter: 'blur(20px)', position: 'sticky', top: 0, height: '100vh' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '40px' }}>
+          <div style={{ padding: '8px', background: 'var(--color-surface-elevated)', borderRadius: '12px' }}><Zap size={20} color="var(--color-text-primary)" /></div>
+          <span style={{ fontWeight: 700, fontSize: '1.2rem', letterSpacing: '-0.03em' }}>OpenIssue</span>
+        </div>
