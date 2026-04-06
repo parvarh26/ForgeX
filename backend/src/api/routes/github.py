@@ -133,3 +133,8 @@ async def _stream_intelligence(repo: str, db: Session):
                         row = matching[0]
                         context_texts.append(f"{row.title}. {row.body}")
                         github_numbers.append(row.github_issue_id)
+
+                insight = llm.generate_cluster_insight(context_texts)
+                urgency = "Critical" if len(group_ids) >= 4 else "Medium"
+
+                cluster_key = f"{label}:{len(group_ids)}"
