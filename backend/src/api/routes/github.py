@@ -68,3 +68,8 @@ async def _stream_intelligence(repo: str, db: Session):
         total = len(raw_issues)
         yield _sse_event({
             "type": "status",
+            "payload": {"msg": f"Fetched {total} open issues. Initializing FAISS spatial matrix..."}
+        })
+
+        # ── EPHEMERAL FAISS SPACE ──────────────────────────────────────────────
+        # Fresh index per plan.md §6.1 — garbage collected after stream completes
