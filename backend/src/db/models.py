@@ -16,3 +16,12 @@ class IssueModel(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     # Multi-tenant boundary: every issue is scoped to its origin repo — plan.md §5.1
+    repo_name = Column(String, index=True, nullable=False, default="unknown")
+    # GitHub's own issue number for deduplication
+    github_issue_id = Column(Integer, index=True, nullable=True)
+    title = Column(String, index=True)
+    body = Column(String)
+    priority_score = Column(Float, default=0.0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class ClusterModel(Base):
