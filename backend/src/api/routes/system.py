@@ -5,3 +5,10 @@ import time
 import psutil
 
 router = APIRouter()
+
+@router.get("/status")
+async def get_system_status():
+    """
+    Returns real-time telemetry for the Backend Status dashboard tab.
+    """
+    # CPU/RAM metrics
