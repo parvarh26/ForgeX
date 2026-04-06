@@ -86,3 +86,6 @@ export default function Landing() {
         Built for SDE-3 Scale
       </div>
 
+    </div>
+  );
+}
