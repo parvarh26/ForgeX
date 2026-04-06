@@ -190,3 +190,11 @@ export default function Dashboard() {
       interval = setInterval(fetchStatus, 3000);
     }
     return () => clearInterval(interval);
+  }, [navActive]);
+
+  async function startStream() {
+    setClusters([]);
+    setComplete(false);
+    setHasError(false);
+    setStreaming(true);
+    setStatusMsg('Initializing SSE bridge...');
