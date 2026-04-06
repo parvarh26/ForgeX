@@ -238,23 +238,8 @@ async def sync_repository(request_data: SyncRequest, background_tasks: Backgroun
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no", "Connection": "keep-alive"}
     )
 
-@router.websocket("/ws/sync/{repo}")
-async def websocket_sync_progress(websocket: WebSocket, repo: str):
-    await websocket.accept()
-    try:
-        while True:
-            status = _sync_status.get(repo, {"processed": 0, "total_repo": 0, "is_syncing": False})
-            await websocket.send_json(status)
-            if not status["is_syncing"]:
-                # Send one final update then chill
-                await asyncio.sleep(2)
-                break
-            await asyncio.sleep(0.5)
-    except Exception:
-        pass
-    finally:
-        try: await websocket.close()
-        except: pass
+
+
 
 @router.delete("/repo")
 async def flush_intelligence(repo: str, db: Session = Depends(get_db)):
