@@ -691,26 +691,94 @@ async def get_spatial_matrix(repo: str, db: Session = Depends(get_db)):
 @router.get("/vector-stats")
 async def get_vector_stats(repo: str, db: Session = Depends(get_db)):
     """
-    FAISS index statistics for a repository.
+    Rich FAISS index telemetry. Loads from disk if not in memory so it works
+    after server restarts without requiring a new sync.
     """
+    import os, json, time as _time
+    from src.core.config import settings
+
+    # --- Ensure vector store is loaded (from disk if needed) ---
     if repo not in _vector_stores:
+        try:
+            v_store = VectorStore(dimension=embedder.dimension, repo_name=repo)
+            _vector_stores[repo] = v_store
+        except Exception as e:
+            log.warning(f"Could not load vector store for {repo}: {e}")
+            v_store = None
+    else:
+        v_store = _vector_stores[repo]
+
+    total_db = db.query(IssueModel).filter(IssueModel.repo_name == repo).count()
+
+    if v_store is None or v_store.index.ntotal == 0:
         return {
-            "indexed": 0,
-            "dimension": 0,
-            "total_db_issues": db.query(IssueModel).filter(IssueModel.repo_name == repo).count(),
-            "coverage_percent": 0,
-            "memory_estimate_mb": 0,
-            "repo": repo,
+            "indexed": 0, "dimension": 0,
+            "total_db_issues": total_db,
+            "coverage_percent": 0, "memory_estimate_mb": 0,
+            "index_file_size_mb": 0, "repo": repo,
+            "clusters": [], "has_index": False,
+            "similarity_distribution": [], "top_clusters": [],
         }
 
-    v_store = _vector_stores[repo]
     all_vecs, all_ids = v_store.get_all_vectors()
     indexed = len(all_vecs)
-    dimension = len(all_vecs[0]) if all_vecs else 0
-    total_db = db.query(IssueModel).filter(IssueModel.repo_name == repo).count()
+    dimension = int(all_vecs[0].shape[0]) if indexed > 0 else 0
     coverage = round((indexed / total_db * 100), 1) if total_db > 0 else 0
-    # Memory estimate: 4 bytes per float32, dimension floats per vector
     memory_mb = round((indexed * dimension * 4) / (1024 * 1024), 2)
+
+    # Index file size from disk
+    repo_slug = repo.replace("/", "_")
+    index_path = os.path.join(settings.FAISS_STORAGE_DIR, f"{repo_slug}.index")
+    map_path = os.path.join(settings.FAISS_STORAGE_DIR, f"{repo_slug}.json")
+    manifest_path = os.path.join(settings.FAISS_STORAGE_DIR, f"{repo_slug}.manifest.json")
+    index_file_mb = round(os.path.getsize(index_path) / (1024 * 1024), 2) if os.path.exists(index_path) else 0
+    manifest_data = {}
+    if os.path.exists(manifest_path):
+        try:
+            with open(manifest_path) as f:
+                manifest_data = json.load(f)
+        except Exception:
+            pass
+
+    # --- Cluster breakdown ---
+    clusters_db = (
+        db.query(ClusterModel)
+        .filter(ClusterModel.repo_name == repo, ClusterModel.cluster_label.isnot(None))
+        .order_by(ClusterModel.size.desc())
+        .all()
+    )
+    cluster_breakdown = [
+        {
+            "label": c.cluster_label,
+            "size": c.size or 0,
+            "urgency": c.urgency or "Medium",
+            "insight": (c.summary_insight or "")[:80],
+            "similarity_score": c.similarity_score or 0.0,
+        }
+        for c in clusters_db if c.cluster_label != -1
+    ]
+
+    # --- Similarity distribution (10 buckets: 0-10%, 10-20%, ... 90-100%) ---
+    sim_buckets = [0] * 10
+    if indexed > 1:
+        vecs_arr = np.array(all_vecs, dtype=np.float32)
+        # Sample up to 500 random pairs for speed
+        import random
+        n = min(indexed, 200)
+        sample_idx = random.sample(range(indexed), n)
+        sample = vecs_arr[sample_idx]
+        dot = np.dot(sample, sample.T)
+        # Flatten upper triangle (pairwise cosine similarities)
+        for i in range(n):
+            for j in range(i + 1, n):
+                sim = float(dot[i, j])
+                bucket = min(int(max(sim, 0) * 10), 9)
+                sim_buckets[bucket] += 1
+
+    sim_distribution = [
+        {"range": f"{i*10}-{(i+1)*10}%", "count": sim_buckets[i]}
+        for i in range(10)
+    ]
 
     return {
         "indexed": indexed,
@@ -718,8 +786,18 @@ async def get_vector_stats(repo: str, db: Session = Depends(get_db)):
         "total_db_issues": total_db,
         "coverage_percent": coverage,
         "memory_estimate_mb": memory_mb,
+        "index_file_size_mb": index_file_mb,
         "repo": repo,
+        "has_index": True,
+        "model_name": manifest_data.get("model_name", settings.EMBEDDING_MODEL_NAME),
+        "written_at": manifest_data.get("written_at"),
+        "total_clusters": len(cluster_breakdown),
+        "clusters": cluster_breakdown,
+        "top_clusters": cluster_breakdown[:5],
+        "similarity_distribution": sim_distribution,
+        "noise_count": indexed - sum(c["size"] for c in cluster_breakdown),
     }
+
 
 # Track last seen GitHub events ETag per repo (for efficient polling)
 _events_etag = {}
