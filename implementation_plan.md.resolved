@@ -158,3 +158,13 @@ curl -N -X POST http://localhost:8000/api/v1/github/sync \
 2. Type `facebook/react` and hover sync button (connection warms)
 3. Click → navigate to `/dashboard`
 4. Watch cluster cards stream in live as DBSCAN identifies topological boundaries
+5. Each `Critical` cluster card has red left-border accent
+
+---
+
+## Execution Order
+1. ✅ Config + DB schema (multi-tenant foundation)
+2. ✅ GitHub service + batch embedding method
+3. ✅ SSE `/github/sync` streaming route
+4. ✅ LLM service upgrade (real context)
+5. ✅ Wire new router in `main.py`
