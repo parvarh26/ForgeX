@@ -88,3 +88,13 @@ async def stream_intelligence(repo, issues):
             yield f'data: {json.dumps({"type": "cluster_found", "payload": {...}})}\n\n'
     
     yield 'data: {"type": "complete"}\n\n'
+```
+
+- Add proper `Cache-Control: no-cache` and `X-Accel-Buffering: no` headers
+
+#### [MODIFY] [embedding_engine.py](file:///Users/mac/Desktop/CHAINVOTE/backend/src/services/ai/embedding_engine.py)
+- Add `generate_embeddings(texts: list[str]) -> list[np.ndarray]` (batch method for thread-pool)
+
+#### [MODIFY] [llm_service.py](file:///Users/mac/Desktop/CHAINVOTE/backend/src/services/ai/llm_service.py)
+- `generate_cluster_insight()` now takes real issue titles/bodies
+- Smarter keyword extraction from actual text (not hardcoded mock)
