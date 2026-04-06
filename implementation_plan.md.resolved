@@ -58,3 +58,13 @@ Core of the plan. Contains:
 ```python
 POST /api/v1/github/sync
 ```
+
+Flow:
+1. Accept `{"repo": "laravel/framework"}` body  
+2. **Scorched earth**: Delete all `IssueModel` and `ClusterModel` rows for that `repo_name`
+3. Fetch 50 issues from GitHub via `github_service.fetch_issues()`
+4. Initialize fresh ephemeral FAISS index (dimension from embedder)
+5. Return `StreamingResponse` with `media_type="text/event-stream"`
+
+Inside the generator:
+```python
