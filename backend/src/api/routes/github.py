@@ -83,3 +83,8 @@ async def _stream_intelligence(repo: str, db: Session):
                 github_issue_id=raw["github_issue_id"],
                 title=raw["title"],
                 body=raw["body"],
+                priority_score=0.5,
+            )
+            db.add(db_issue)
+        db.commit()
+        # Refresh to get assigned IDs
