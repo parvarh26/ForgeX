@@ -12,3 +12,10 @@ class Settings(BaseSettings):
     FAISS_INDEX_PATH: str = "faiss_index.bin"
     # Epsilon=0.28 isolates micro-trends per plan.md §6.2
     DBSCAN_EPS: float = 0.28
+    DBSCAN_MIN_SAMPLES: int = 2
+    
+    # LLM Config
+    LLM_API_KEY: Optional[str] = None
+    LLM_PROVIDER: str = "mock" # options: "mock", "groq"
+
+    # GitHub API Config — set GITHUB_TOKEN in .env for higher rate limits
