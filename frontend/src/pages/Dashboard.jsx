@@ -30,3 +30,11 @@ async function* readSSEStream(response) {
     }
   }
 }
+
+// ── Sub-components ────────────────────────────────────────────────────────────
+
+function StatusPill({ msg, streaming, complete, hasError }) {
+  const color = hasError ? 'var(--accent-critical)' : complete ? 'var(--accent-success)' : 'var(--accent-info)';
+  const Icon = hasError ? XCircle : complete ? CheckCircle2 : Loader2;
+
+  return (
