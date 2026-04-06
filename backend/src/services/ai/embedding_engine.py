@@ -34,3 +34,12 @@ class EmbeddingEngine:
         This is the method handed off to run_in_threadpool for chunked processing
         per plan.md §4.1 — isolates CPU-bound PyTorch math from the async event loop.
         """
+        try:
+            log.info(f"Batch encoding {len(texts)} texts in thread-pool...")
+            vectors = self.model.encode(texts, convert_to_numpy=True)
+            normalized = []
+            for v in vectors:
+                norm = np.linalg.norm(v)
+                normalized.append(v / norm if norm > 0 else v)
+            return normalized
+        except Exception as e:
