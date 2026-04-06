@@ -302,3 +302,11 @@ export default function Dashboard() {
       <p style={{ marginTop: '32px', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
         Visualizing vector density across the manifold. Shaded cells represent localized high-density incident regions (ε=0.28).
       </p>
+    </div>
+  );
+
+  const renderVectorIndex = () => (
+    <div className="surface-card stagger-1" style={{ padding: '40px' }}>
+      <h2 style={{ marginBottom: '32px' }}>FAISS Index Metadata</h2>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        {[
