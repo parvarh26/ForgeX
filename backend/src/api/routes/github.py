@@ -1,7 +1,7 @@
 import json
 import asyncio
 import numpy as np
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Request
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import StreamingResponse
 from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.orm import Session
@@ -302,7 +302,7 @@ async def sync_repository(request_data: SyncRequest, background_tasks: Backgroun
 @router.get("/sync/progress")
 async def get_sync_progress(repo: str):
     """
-    Poll this endpoint to draw the beautiful Sync Bar.
+    Poll this endpoint to draw the beautiful Sync Bar (Legacy fallback).
     """
     status = _sync_status.get(repo, {
         "processed": 0,
@@ -310,6 +310,38 @@ async def get_sync_progress(repo: str):
         "is_syncing": False
     })
     return status
+
+@router.websocket("/ws/sync/{repo}")
+async def websocket_sync_progress(websocket: WebSocket, repo: str):
+    """
+    Real-time WebSocket stream for repository synchronization progress.
+    Pushes status updates every 250ms to the frontend.
+    """
+    await websocket.accept()
+    log.info(f"WebSocket sync connection opened for {repo}")
+    try:
+        while True:
+            status = _sync_status.get(repo, {
+                "processed": 0,
+                "total_repo": 0,
+                "is_syncing": False
+            })
+            await websocket.send_json(status)
+            if not status["is_syncing"]:
+                # Keep the connection alive for a few more seconds just in case
+                await asyncio.sleep(5)
+                # But stop the tight loop
+                break
+            await asyncio.sleep(0.25)
+    except WebSocketDisconnect:
+        log.info(f"WebSocket sync disconnected for {repo}")
+    except Exception as e:
+        log.error(f"WebSocket error for {repo}: {e}")
+    finally:
+        try:
+            await websocket.close()
+        except:
+            pass
 
 @router.delete("/repo")
 async def flush_intelligence(repo: str, db: Session = Depends(get_db)):
