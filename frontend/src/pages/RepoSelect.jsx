@@ -4,3 +4,9 @@ import { GitBranch, ArrowRight, Zap, Search } from 'lucide-react';
 
 const SUGGESTED_REPOS = [
   'facebook/react',
+  'vercel/next.js',
+  'laravel/framework',
+  'microsoft/vscode',
+  'django/django',
+];
+
