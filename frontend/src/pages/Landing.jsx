@@ -14,3 +14,11 @@ export default function Landing() {
       alignItems: 'center',
       padding: '40px',
       background: 'radial-gradient(circle at center, #111111 0%, #000000 100%)',
+      overflow: 'hidden'
+    }}>
+      
+      {/* Glossy Backdrop Accents */}
+      <div style={{
+        position: 'absolute', top: '-10%', left: '-10%', width: '40%', height: '40%',
+        background: 'radial-gradient(circle, rgba(59,130,246,0.05) 0%, transparent 70%)',
+        filter: 'blur(80px)', pointerEvents: 'none'
