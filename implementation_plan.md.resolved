@@ -128,3 +128,13 @@ Complete rewrite from REST polling to SSE:
 
 ---
 
+### Frontend — CSS Cleanup
+
+#### [MODIFY] [index.css](file:///Users/mac/Desktop/CHAINVOTE/frontend/src/index.css)
+- This file is imported but unused (conflicting with `styles/global.css`)
+- Clear it and add a single `@import './styles/global.css'` redirect, eliminating the duplicate design system
+
+---
+
+## Verification Plan
+
