@@ -30,3 +30,11 @@ export default function Landing() {
       }} />
 
       <div className="stagger-1" style={{ 
+        display: 'inline-flex', 
+        alignItems: 'center', 
+        gap: '8px',
+        padding: '8px 16px',
+        background: 'rgba(255,255,255,0.03)',
+        border: 'var(--border-subtle)',
+        borderRadius: 'var(--radius-pill)',
+        marginBottom: '40px',
