@@ -118,3 +118,9 @@ export default function RepoSelect() {
         </label>
 
         <div style={{ position: 'relative', marginBottom: '8px' }}>
+          <Search size={15} style={{
+            position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)',
+            color: 'var(--color-text-muted)',
+            pointerEvents: 'none'
+          }} />
+          <input
