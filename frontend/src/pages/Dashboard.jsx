@@ -142,3 +142,11 @@ function ClusterCard({ cluster, index }) {
           <span style={{ padding: '5px 10px', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
             +{cluster.github_issue_numbers.length - 10} others
           </span>
+        )}
+      </div>
+
+      {/* Progress annotation */}
+      {cluster.progress && (
+        <div style={{ marginTop: '16px', fontSize: '0.7rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <Activity size={12} /> {cluster.progress}
+        </div>
