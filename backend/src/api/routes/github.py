@@ -143,3 +143,8 @@ async def _stream_intelligence(repo: str, db: Session):
                     yield _sse_event({
                         "type": "cluster_found",
                         "payload": {
+                            "cluster_label": label,
+                            "insight": insight,
+                            "issue_count": len(group_ids),
+                            "urgency": urgency,
+                            "github_issue_numbers": github_numbers,
