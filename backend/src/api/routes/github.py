@@ -73,3 +73,8 @@ async def _stream_intelligence(repo: str, db: Session):
 
         # ── EPHEMERAL FAISS SPACE ──────────────────────────────────────────────
         # Fresh index per plan.md §6.1 — garbage collected after stream completes
+        v_store = VectorStore(dimension=embedder.dimension)
+
+        # Persist raw issues to DB first (speed layer)
+        db_issue_map = {}  # github_issue_id -> db row id
+        for raw in raw_issues:
