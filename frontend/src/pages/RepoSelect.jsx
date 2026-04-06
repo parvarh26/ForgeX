@@ -166,3 +166,9 @@ export default function RepoSelect() {
             width: '100%',
             justifyContent: 'center',
             padding: '16px',
+            marginTop: '24px',
+            fontSize: '1rem',
+            opacity: syncing ? 0.7 : 1,
+            cursor: 'pointer'
+          }}
+        >
