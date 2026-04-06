@@ -40,3 +40,10 @@ export default function GithubLogin() {
         zIndex: 1,
         boxShadow: 'var(--shadow-hover)'
       }}>
+        <div style={{
+          padding: '20px',
+          background: 'rgba(255,255,255,0.03)',
+          borderRadius: '20px',
+          marginBottom: '32px',
+          border: 'var(--border-subtle)'
+        }}>
