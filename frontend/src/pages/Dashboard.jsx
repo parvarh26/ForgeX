@@ -78,3 +78,11 @@ function ClusterCard({ cluster, index }) {
       )}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+        <div style={{ flex: 1, paddingLeft: isCritical ? '12px' : 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+            {isCritical && <ShieldAlert size={16} color="var(--accent-critical)" />}
+            <span style={{
+              fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: isCritical ? 'var(--accent-critical)' : 'var(--accent-info)',
+            }}>
