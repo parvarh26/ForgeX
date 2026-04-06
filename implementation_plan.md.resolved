@@ -18,3 +18,13 @@ Full codebase assessed. The foundation is solid: FastAPI + FAISS + DBSCAN + Sent
 | DBSCAN epsilon = 0.28 | ❌ Missing | Config is `0.5` |
 | Real LLM context (not mock) | ❌ Missing | `clusters.py` uses `"mock login text"` hardcoded |
 | Frontend free-text repo input | ❌ Missing | RepoSelect uses 3 hardcoded mock repos |
+| `onMouseEnter` pre-fetch | ❌ Missing | Only `onClick` used |
+| `EventSource` SSE client | ❌ Missing | Dashboard uses `@tanstack/react-query` REST poll |
+
+---
+
+## Proposed Changes
+
+### Backend — Core ML Pipeline
+
+#### [MODIFY] [config.py](file:///Users/mac/Desktop/CHAINVOTE/backend/src/core/config.py)
