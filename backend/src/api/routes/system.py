@@ -19,3 +19,10 @@ async def get_system_status():
     llm_health = "active" if settings.LLM_PROVIDER != "mock" or settings.LLM_API_KEY else "simulation"
     
     return {
+        "status": "operational",
+        "telemetry": {
+            "cpu": cpu_usage,
+            "ram": ram_usage,
+            "latency_ms": 12, # mock latency
+            "llm_provider": settings.LLM_PROVIDER,
+            "llm_health": llm_health,
