@@ -33,3 +33,6 @@ class ClusteringEngine:
             return cluster_map
         except Exception as e:
             log.error(f"Clustering failed: {e}")
+            return {}
+
+clusterer = ClusteringEngine()
