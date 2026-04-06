@@ -168,3 +168,6 @@ curl -N -X POST http://localhost:8000/api/v1/github/sync \
 3. ✅ SSE `/github/sync` streaming route
 4. ✅ LLM service upgrade (real context)
 5. ✅ Wire new router in `main.py`
+6. ✅ RepoSelect — real input + `onMouseEnter` pre-fetch
+7. ✅ Dashboard — EventSource/fetch SSE consumption
+8. ✅ CSS deduplication
