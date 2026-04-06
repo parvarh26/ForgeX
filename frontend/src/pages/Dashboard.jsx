@@ -334,3 +334,11 @@ export default function Dashboard() {
             <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>{systemStatus.telemetry.cpu}%</div>
           </div>
           <div className="surface-card" style={{ padding: '20px', background: 'rgba(255,255,255,0.02)' }}>
+            <div style={{ color: 'var(--color-text-muted)', fontSize: '0.7rem', textTransform: 'uppercase', marginBottom: '8px' }}>RAM Usage</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>{systemStatus.telemetry.ram}%</div>
+          </div>
+          <div className="surface-card" style={{ padding: '20px', background: 'rgba(255,255,255,0.02)' }}>
+            <div style={{ color: 'var(--color-text-muted)', fontSize: '0.7rem', textTransform: 'uppercase', marginBottom: '8px' }}>API Latency</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>{systemStatus.telemetry.latency_ms}ms</div>
+          </div>
+          <div className="surface-card" style={{ padding: '20px', background: 'rgba(255,255,255,0.02)' }}>
