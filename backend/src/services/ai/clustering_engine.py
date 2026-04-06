@@ -23,3 +23,8 @@ class ClusteringEngine:
             clustering = DBSCAN(eps=self.eps, min_samples=self.min_samples, metric='cosine')
             labels = clustering.fit_predict(vectors)
             
+            cluster_map = {}
+            for index, label in enumerate(labels):
+                lbl_int = int(label)
+                if lbl_int not in cluster_map:
+                    cluster_map[lbl_int] = []
