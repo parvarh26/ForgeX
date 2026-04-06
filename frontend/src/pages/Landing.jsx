@@ -70,3 +70,11 @@ export default function Landing() {
         marginBottom: '48px',
         fontWeight: 400
       }}>
+        Ingest, vectorize, and autonomously cluster your GitHub issue stream in milliseconds. 
+      </p>
+
+      <button 
+        id="landing-cta"
+        onClick={() => navigate('/login')}
+        className="btn-premium stagger-3" 
+        style={{ padding: '18px 36px', fontSize: '1.1rem', cursor: 'pointer' }}
