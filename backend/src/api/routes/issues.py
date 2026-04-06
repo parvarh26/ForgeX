@@ -10,6 +10,31 @@ from src.core.logger import log
 
 router = APIRouter()
 
+@router.get("/")
+async def list_issues(repo: str, limit: int = 100, db: Session = Depends(get_db)):
+    """
+    List all indexed issues for a repo. Used as fallback display when corpus
+    is too small for DBSCAN to form clusters.
+    """
+    rows = (
+        db.query(IssueModel)
+        .filter(IssueModel.repo_name == repo)
+        .order_by(IssueModel.github_issue_id.desc())
+        .limit(limit)
+        .all()
+    )
+    return [
+        {
+            "id": r.id,
+            "github_issue_id": r.github_issue_id,
+            "title": r.title,
+            "state": r.state,
+            "labels": r.labels,
+            "repo_name": r.repo_name,
+        }
+        for r in rows
+    ]
+
 # Global reference that will be set in main.py
 v_store = None
 

@@ -305,6 +305,8 @@ function DashboardInner() {
   const [newActivity, setNewActivity] = useState(null);
   const [navActive, setNavActive] = useState('Intelligence');
   const [previewCluster, setPreviewCluster] = useState(null);
+  const [rawIssues, setRawIssues] = useState([]);
+  const [rawLoading, setRawLoading] = useState(false);
 
   const abortRef = useRef(null);
   const bufferRef = useRef([]);
@@ -411,7 +413,18 @@ function DashboardInner() {
         if (!mountedRef.current) break;
         if (type === 'status') setStatusMsg(payload?.msg || '');
         if (type === 'cluster_found') bufferRef.current.push(payload || {});
-        if (type === 'complete') { setStreaming(false); setComplete(true); setStatusMsg(payload?.msg || 'Matrix ready.'); }
+        if (type === 'complete') {
+          setStreaming(false); setComplete(true); setStatusMsg(payload?.msg || 'Matrix ready.');
+          // If no clusters found, fetch raw issues as fallback display
+          setTimeout(() => {
+            if (!mountedRef.current) return;
+            // Check after buffer flush (400ms throttle)
+            setRawIssues(prev => {
+              if (bufferRef.current.length === 0) fetchRawIssues();
+              return prev;
+            });
+          }, 600);
+        }
         if (type === 'error') { setStreaming(false); setHasError(true); setStatusMsg(payload?.msg || 'Pipeline error.'); }
       }
     } catch (err) {
@@ -422,6 +435,18 @@ function DashboardInner() {
         setStatusMsg(err.message || 'Connection failed.');
       }
     }
+  };
+
+  const fetchRawIssues = async () => {
+    setRawLoading(true);
+    try {
+      const r = await fetch(`http://localhost:8000/api/v1/issues/?repo=${encodeURIComponent(repo)}&limit=100`);
+      if (r.ok) {
+        const d = await r.json();
+        if (mountedRef.current) setRawIssues(Array.isArray(d) ? d : (d.issues || []));
+      }
+    } catch {}
+    finally { if (mountedRef.current) setRawLoading(false); }
   };
 
   const renderIntelligence = () => (
@@ -474,12 +499,12 @@ function DashboardInner() {
             {clusters.length > 100 && <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#8b949e', fontWeight: 400 }}>Showing top 100</span>}
           </div>
           {clusters.slice(0, 100).map((c, idx) => (
-            <ClusterCard 
-              key={c.cluster_label || idx} 
-              cluster={c} 
-              index={idx} 
-              navigate={navigate} 
-              onPreview={setPreviewCluster} 
+            <ClusterCard
+              key={c.cluster_label || idx}
+              cluster={c}
+              index={idx}
+              navigate={navigate}
+              onPreview={setPreviewCluster}
               repoOwner={owner}
               repoName={repoName}
             />
@@ -491,14 +516,70 @@ function DashboardInner() {
           <div style={{ color: '#c9d1d9', fontSize: '14px', marginBottom: '4px' }}>Building intelligence matrix...</div>
           <div style={{ color: '#8b949e', fontSize: '12px' }}>{statusMsg}</div>
         </div>
-      ) : (
+      ) : hasError ? (
         <div style={{ padding: '60px', textAlign: 'center', border: '1px solid #30363d', borderRadius: '6px' }}>
-          <div style={{ color: '#8b949e', fontSize: '14px', marginBottom: '12px' }}>
-            {hasError ? `Pipeline error: ${statusMsg}` : 'No clusters yet.'}
-          </div>
+          <div style={{ color: '#f85149', fontSize: '14px', marginBottom: '12px' }}>Pipeline error: {statusMsg}</div>
           <button onClick={startStream} style={{ background: '#238636', border: 'none', color: '#fff', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <RefreshCw size={13} /> Start Sync
+            <RefreshCw size={13} /> Retry Sync
           </button>
+        </div>
+      ) : (
+        /* Zero-cluster fallback — show raw issues list */
+        <div style={{ border: '1px solid #30363d', borderRadius: '6px', overflow: 'hidden' }}>
+          <div style={{ padding: '12px 16px', background: '#161b22', borderBottom: '1px solid #30363d', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', fontWeight: 600, color: '#c9d1d9' }}>
+            <Activity size={13} />
+            <span>Issues ({rawIssues.length})</span>
+            <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#8b949e', fontWeight: 400, padding: '1px 7px', borderRadius: '20px', background: 'rgba(210,153,34,0.1)', border: '1px solid rgba(210,153,34,0.25)', color: '#d29922' }}>
+              Corpus too small for clustering
+            </span>
+          </div>
+          {rawLoading ? (
+            <div style={{ padding: '40px', textAlign: 'center' }}>
+              <Loader2 size={22} style={{ animation: 'spin 1.5s linear infinite', color: '#58a6ff' }} />
+            </div>
+          ) : rawIssues.length === 0 ? (
+            <div style={{ padding: '40px', textAlign: 'center', color: '#8b949e', fontSize: '13px' }}>
+              No issues found.
+              <button onClick={fetchRawIssues} style={{ display: 'block', margin: '12px auto 0', background: '#21262d', border: '1px solid #30363d', color: '#c9d1d9', padding: '6px 14px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}>Load Issues</button>
+            </div>
+          ) : (
+            rawIssues.map((issue, idx) => (
+              <div
+                key={issue.id || idx}
+                style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '12px 16px', borderTop: idx === 0 ? 'none' : '1px solid #21262d', background: '#0d1117', cursor: 'default' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#161b22'}
+                onMouseLeave={e => e.currentTarget.style.background = '#0d1117'}
+              >
+                {/* State dot */}
+                <div style={{ marginTop: '3px', flexShrink: 0 }}>
+                  <svg viewBox="0 0 16 16" width="15" height="15" fill={(issue.state === 'open') ? '#3fb950' : '#8957e5'}>
+                    <path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                    <path fillRule="evenodd" d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z" />
+                  </svg>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '3px' }}>
+                    <a
+                      href={`https://github.com/${repo}/issues/${issue.github_issue_id || issue.number}`}
+                      target="_blank" rel="noopener noreferrer"
+                      style={{ fontSize: '14px', fontWeight: 600, color: '#c9d1d9', textDecoration: 'none' }}
+                      onMouseEnter={e => e.currentTarget.style.color = '#58a6ff'}
+                      onMouseLeave={e => e.currentTarget.style.color = '#c9d1d9'}
+                    >
+                      {issue.title}
+                    </a>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '12px', color: '#6e7681' }}>#{issue.github_issue_id || issue.number}</span>
+                    {issue.labels && issue.labels.split(',').filter(Boolean).map(l => (
+                      <span key={l} style={{ fontSize: '10px', padding: '1px 7px', borderRadius: '20px', background: 'rgba(88,166,255,0.08)', color: '#58a6ff', border: '1px solid rgba(88,166,255,0.2)' }}>{l.trim()}</span>
+                    ))}
+                    <span style={{ fontSize: '11px', color: issue.state === 'open' ? '#3fb950' : '#8957e5', marginLeft: 'auto' }}>{issue.state}</span>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
     </>
