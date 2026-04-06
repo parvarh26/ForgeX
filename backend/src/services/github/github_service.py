@@ -22,3 +22,11 @@ class GitHubService:
         }
         token = settings.GITHUB_TOKEN
         if token:
+            headers["Authorization"] = f"Bearer {token}"
+            log.info("GitHub request authenticated with GITHUB_TOKEN.")
+        else:
+            log.warning("No GITHUB_TOKEN set — using unauthenticated mode (60 req/hr cap).")
+        return headers
+
+    async def fetch_issues(self, repo: str, limit: int = 200) -> List[Dict]:
+        """
