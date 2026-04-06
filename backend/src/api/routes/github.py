@@ -63,3 +63,8 @@ async def _stream_intelligence(repo: str, db: Session):
 
         if not raw_issues:
             yield _sse_event({"type": "error", "payload": {"msg": f"No open issues found for '{repo}'."}})
+            return
+
+        total = len(raw_issues)
+        yield _sse_event({
+            "type": "status",
