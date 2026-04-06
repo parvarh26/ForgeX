@@ -38,3 +38,8 @@ button {
 /* Premium Standard Card */
 .surface-card {
   background: var(--color-surface);
+  border: var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 24px;
+}
+
