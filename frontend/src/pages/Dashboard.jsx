@@ -182,3 +182,11 @@ export default function Dashboard() {
     if (navActive === 'Backend Status') {
       const fetchStatus = () => {
         fetch('http://localhost:8000/api/v1/system/status')
+          .then(res => res.json())
+          .then(setSystemStatus)
+          .catch(() => {});
+      };
+      fetchStatus();
+      interval = setInterval(fetchStatus, 3000);
+    }
+    return () => clearInterval(interval);
