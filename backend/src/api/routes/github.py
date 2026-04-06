@@ -1,6 +1,7 @@
 import json
 import asyncio
 import numpy as np
+import httpx
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import StreamingResponse
 from fastapi.concurrency import run_in_threadpool
@@ -263,3 +264,211 @@ async def flush_intelligence(repo: str, db: Session = Depends(get_db)):
     if repo in _vector_stores: del _vector_stores[repo]
     if repo in _sync_status: del _sync_status[repo]
     return {"status": "flushed", "repo": repo}
+
+@router.get("/contents")
+async def proxy_github_contents(repo: str, path: str = ""):
+    """
+    Server-side proxy for GitHub Contents API.
+    Prevents browser 403s by using the server GITHUB_TOKEN.
+    """
+    url = f"https://api.github.com/repos/{repo}/contents/{path}"
+    headers = github_service._build_headers()
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.get(url, headers=headers)
+            if resp.status_code == 403:
+                raise HTTPException(status_code=403, detail="GitHub rate limit. Set GITHUB_TOKEN in backend/.env")
+            if resp.status_code == 404:
+                raise HTTPException(status_code=404, detail="Path not found in repository.")
+            if resp.status_code != 200:
+                raise HTTPException(status_code=resp.status_code, detail=resp.text[:200])
+            return resp.json()
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=504, detail="GitHub API timeout")
+
+@router.get("/raw")
+async def proxy_github_raw(url: str):
+    """
+    Server-side proxy for raw file content fetching.
+    """
+    if not url.startswith("https://raw.githubusercontent.com"):
+        raise HTTPException(status_code=400, detail="Only raw.githubusercontent.com URLs are allowed.")
+    try:
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            resp = await client.get(url, headers=github_service._build_headers())
+            if resp.status_code != 200:
+                raise HTTPException(status_code=resp.status_code, detail="File not accessible.")
+            from fastapi.responses import PlainTextResponse
+            return PlainTextResponse(resp.text)
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=504, detail="File fetch timeout")
+
+@router.get("/spatial")
+async def get_spatial_matrix(repo: str, db: Session = Depends(get_db)):
+    """
+    PCA 2D projection of all FAISS vectors for a repo.
+    Returns x,y coordinates + cluster label for each issue.
+    Fast: <1s for any repo size. Cached per-repo.
+    """
+    from sklearn.decomposition import PCA
+
+    if repo not in _vector_stores:
+        raise HTTPException(status_code=404, detail="No vector index found. Run a sync first.")
+
+    v_store = _vector_stores[repo]
+    all_vecs, all_ids = v_store.get_all_vectors()
+
+    if len(all_vecs) < 3:
+        raise HTTPException(status_code=422, detail="Need at least 3 vectors for spatial projection.")
+
+    try:
+        vecs_array = np.array(all_vecs)
+        # Reduce to 2D via PCA
+        n_components = min(2, vecs_array.shape[0], vecs_array.shape[1])
+        pca = PCA(n_components=n_components)
+        coords = pca.fit_transform(vecs_array)
+
+        # Load cluster assignments from DB
+        clusters = db.query(ClusterModel).filter(ClusterModel.repo_name == repo).all()
+        # Map db_id → cluster_label
+        id_to_cluster = {}
+        for c in clusters:
+            if c.github_issue_numbers:
+                nums = c.github_issue_numbers.split(",")
+                # Map by position: get db_ids from issue numbers
+                issue_rows = db.query(IssueModel).filter(
+                    IssueModel.repo_name == repo,
+                    IssueModel.github_issue_id.in_([int(n) for n in nums if n.strip().isdigit()])
+                ).all()
+                for row in issue_rows:
+                    id_to_cluster[row.id] = {
+                        "label": c.cluster_label,
+                        "urgency": c.urgency,
+                        "insight": c.summary_insight,
+                    }
+
+        points = []
+        for i, (vec_id, coord) in enumerate(zip(all_ids, coords)):
+            cluster_info = id_to_cluster.get(vec_id, {"label": -1, "urgency": "noise", "insight": ""})
+            # Get issue details
+            issue = db.get(IssueModel, vec_id)
+            points.append({
+                "id": vec_id,
+                "x": float(coord[0]),
+                "y": float(coord[1]),
+                "cluster_label": cluster_info["label"],
+                "urgency": cluster_info["urgency"],
+                "issue_number": issue.github_issue_id if issue else None,
+                "title": issue.title[:80] if issue else "",
+            })
+
+        explained = pca.explained_variance_ratio_.tolist() if hasattr(pca, 'explained_variance_ratio_') else [0, 0]
+        return {
+            "points": points,
+            "total": len(points),
+            "explained_variance": explained,
+            "repo": repo,
+        }
+
+    except Exception as e:
+        log.error(f"PCA spatial fault: {e}")
+        raise HTTPException(status_code=500, detail=f"Spatial projection failed: {str(e)}")
+
+@router.get("/vector-stats")
+async def get_vector_stats(repo: str, db: Session = Depends(get_db)):
+    """
+    FAISS index statistics for a repository.
+    """
+    if repo not in _vector_stores:
+        return {
+            "indexed": 0,
+            "dimension": 0,
+            "total_db_issues": db.query(IssueModel).filter(IssueModel.repo_name == repo).count(),
+            "coverage_percent": 0,
+            "memory_estimate_mb": 0,
+            "repo": repo,
+        }
+
+    v_store = _vector_stores[repo]
+    all_vecs, all_ids = v_store.get_all_vectors()
+    indexed = len(all_vecs)
+    dimension = len(all_vecs[0]) if all_vecs else 0
+    total_db = db.query(IssueModel).filter(IssueModel.repo_name == repo).count()
+    coverage = round((indexed / total_db * 100), 1) if total_db > 0 else 0
+    # Memory estimate: 4 bytes per float32, dimension floats per vector
+    memory_mb = round((indexed * dimension * 4) / (1024 * 1024), 2)
+
+    return {
+        "indexed": indexed,
+        "dimension": dimension,
+        "total_db_issues": total_db,
+        "coverage_percent": coverage,
+        "memory_estimate_mb": memory_mb,
+        "repo": repo,
+    }
+
+# Track last seen GitHub events ETag per repo (for efficient polling)
+_events_etag = {}
+_events_last_check = {}
+
+@router.websocket("/ws/sync/{repo}")
+async def websocket_sync_progress(websocket: WebSocket, repo: str):
+    """
+    Real-time WebSocket: sync progress + GitHub Events incremental detection.
+    """
+    await websocket.accept()
+    log.info(f"WebSocket connected for {repo}")
+    check_interval = 0
+    try:
+        while True:
+            status = _sync_status.get(repo, {"processed": 0, "total_repo": 0, "is_syncing": False})
+            await websocket.send_json(status)
+
+            # Every 60 ticks (30s at 0.5s interval) check GitHub Events for new activity
+            check_interval += 1
+            if check_interval >= 60 and not status.get("is_syncing"):
+                check_interval = 0
+                try:
+                    url = f"https://api.github.com/repos/{repo}/events"
+                    headers = github_service._build_headers()
+                    etag = _events_etag.get(repo)
+                    if etag:
+                        headers["If-None-Match"] = etag
+
+                    async with httpx.AsyncClient(timeout=10.0) as client:
+                        resp = await client.get(url, headers=headers, params={"per_page": 10})
+
+                    if resp.status_code == 200:
+                        new_etag = resp.headers.get("ETag")
+                        if new_etag and new_etag != _events_etag.get(repo):
+                            _events_etag[repo] = new_etag
+                            events = resp.json()
+                            # Count new issue events
+                            new_issues = [e for e in events if e.get("type") in ("IssuesEvent", "IssueCommentEvent")]
+                            if new_issues and _events_etag.get(repo):  # Don't fire on first poll
+                                await websocket.send_json({
+                                    **status,
+                                    "new_activity": True,
+                                    "new_event_count": len(new_issues),
+                                })
+                            elif not _events_etag.get(repo, True):
+                                _events_etag[repo] = new_etag  # Seed first etag silently
+                    # 304 = no changes, ignore silently
+                except Exception as e:
+                    log.debug(f"Events poll skipped: {e}")
+
+            if not status.get("is_syncing"):
+                await asyncio.sleep(2)
+            else:
+                await asyncio.sleep(0.5)
+
+    except WebSocketDisconnect:
+        log.info(f"WebSocket disconnected for {repo}")
+    except Exception as e:
+        log.error(f"WebSocket error: {e}")
+    finally:
+        try:
+            await websocket.close()
+        except:
+            pass
+

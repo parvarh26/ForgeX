@@ -213,8 +213,12 @@ function RepositoryBrowser({ repo }) {
     setError('');
     setSelectedFile(null); 
     try {
-      const resp = await fetch(`https://api.github.com/repos/${repo}/contents/${currentPath}`);
-      if (!resp.ok) throw new Error('Repository unreachable.');
+      // Use backend proxy to avoid GitHub 403 rate-limit errors
+      const resp = await fetch(`http://localhost:8000/api/v1/github/contents?repo=${encodeURIComponent(repo)}&path=${encodeURIComponent(currentPath)}`);
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({ detail: 'Repository unreachable.' }));
+        throw new Error(err.detail || 'Repository unreachable.');
+      }
       const data = await resp.json();
       const sorted = Array.isArray(data) ? data.sort((a, b) => {
         if (a.type === b.type) return a.name.localeCompare(b.name);
@@ -224,8 +228,9 @@ function RepositoryBrowser({ repo }) {
 
       if (currentPath === '') {
         const readmeFile = sorted.find(f => f.name.toLowerCase() === 'readme.md');
-        if (readmeFile) {
-          fetch(readmeFile.download_url).then(r => r.text()).then(setReadme).catch(() => {});
+        if (readmeFile && readmeFile.download_url) {
+          fetch(`http://localhost:8000/api/v1/github/raw?url=${encodeURIComponent(readmeFile.download_url)}`)
+            .then(r => r.text()).then(setReadme).catch(() => {});
         } else {
           setReadme(null);
         }
@@ -243,7 +248,8 @@ function RepositoryBrowser({ repo }) {
     setSelectedFile(file);
     setFileLoading(true);
     try {
-      const r = await fetch(file.download_url);
+      // Proxy raw file through backend to avoid 403
+      const r = await fetch(`http://localhost:8000/api/v1/github/raw?url=${encodeURIComponent(file.download_url)}`);
       const text = await r.text();
       setFileContent(text);
     } catch (e) {
