@@ -43,3 +43,8 @@ button {
   padding: 24px;
 }
 
+.surface-card.interactive {
+  transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.surface-card.interactive:hover {
