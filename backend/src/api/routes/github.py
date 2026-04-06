@@ -18,3 +18,8 @@ router = APIRouter()
 
 
 class SyncRequest(BaseModel):
+    repo: str  # Format: "owner/repo" e.g. "facebook/react"
+
+
+def _sse_event(payload: dict) -> str:
+    """Format a dict as a valid SSE data line."""
