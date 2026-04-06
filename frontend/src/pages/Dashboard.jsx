@@ -390,3 +390,11 @@ export default function Dashboard() {
             <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem', letterSpacing: '0.01em' }}>{repo} · Live Intelligence Stream</p>
           </div>
           <StatusPill msg={statusMsg} streaming={streaming} complete={complete} hasError={hasError} />
+        </header>
+
+        {streaming && progress.total > 0 && (
+          <div className="stagger-1" style={{ marginBottom: '40px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', fontSize: '0.78rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <span>Vectorizing incidents</span>
+              <span>{progress.processed} / {progress.total} Mapped</span>
+            </div>
