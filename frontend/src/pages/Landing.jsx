@@ -62,3 +62,11 @@ export default function Landing() {
       </h1>
 
       <p className="stagger-3" style={{
+        fontSize: '1.25rem',
+        color: 'var(--color-text-secondary)',
+        maxWidth: '520px',
+        textAlign: 'center',
+        lineHeight: '1.6',
+        marginBottom: '48px',
+        fontWeight: 400
+      }}>
