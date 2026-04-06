@@ -238,3 +238,11 @@ export default function Dashboard() {
           setStreaming(false);
           setComplete(true);
         }
+        if (type === 'error') {
+          setStatusMsg(payload.msg);
+          setStreaming(false);
+          setHasError(true);
+        }
+      }
+    } catch (err) {
+      if (err.name !== 'AbortError') {
