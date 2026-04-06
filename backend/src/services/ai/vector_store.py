@@ -25,3 +25,12 @@ class VectorStore:
             self.index.add(vec_2d)
             self.id_map.append(db_id)
             log.info(f"Added vector for db_id {db_id} to FAISS. Total size: {self.index.ntotal}")
+        except Exception as e:
+            log.error(f"Failed to add vector to FAISS: {e}")
+            raise
+
+    def search_similar(self, vector: np.ndarray, top_k: int = 5):
+        """Search top-K nearest neighbors"""
+        if self.index.ntotal == 0:
+            return []
+            
