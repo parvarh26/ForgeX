@@ -254,3 +254,11 @@ export default function Dashboard() {
   }
 
   const renderIntelligence = () => (
+    <>
+      {/* Stats row */}
+      {(clusters.length > 0 || complete) && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '40px' }}>
+          {[
+            { label: 'Neural Clusters', value: clusters.length, color: 'var(--accent-info)' },
+            { label: 'Critical Mass', value: clusters.filter(c => c.urgency === 'Critical').length, color: 'var(--accent-critical)' },
+            { label: 'Issues Ingested', value: progress.total || '—', color: 'var(--color-text-primary)' },
