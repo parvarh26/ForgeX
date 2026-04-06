@@ -163,3 +163,8 @@ async def _stream_intelligence(repo: str, db: Session):
 
             # Yield control briefly so FastAPI can flush the buffer
             await asyncio.sleep(0)
+
+        # ── FINAL SIGNAL ──────────────────────────────────────────────────────
+        final_cluster_count = len([k for k in seen_cluster_labels if k != -1])
+        yield _sse_event({
+            "type": "complete",
