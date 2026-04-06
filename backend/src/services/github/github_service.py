@@ -54,3 +54,11 @@ class GitHubService:
                 log.info(f"Fetching page {page} of issues from {repo}...")
                 response = await client.get(url, headers=self._build_headers(), params=params)
 
+                if response.status_code == 404:
+                    raise ValueError(f"Repository '{repo}' not found on GitHub.")
+                if response.status_code == 403:
+                    raise ValueError(f"GitHub API rate limit exceeded. Set GITHUB_TOKEN for higher quota.")
+                if response.status_code != 200:
+                    raise ValueError(f"GitHub API error {response.status_code}: {response.text[:200]}")
+
+                raw_batch = response.json()
