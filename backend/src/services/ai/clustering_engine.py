@@ -18,3 +18,8 @@ class ClusteringEngine:
         if len(vectors) == 0:
             return {}
 
+        log.info(f"Running DBSCAN over {len(vectors)} items with eps={self.eps}")
+        try:
+            clustering = DBSCAN(eps=self.eps, min_samples=self.min_samples, metric='cosine')
+            labels = clustering.fit_predict(vectors)
+            
