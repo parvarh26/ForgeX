@@ -78,3 +78,8 @@ button {
   align-items: center;
   gap: 12px;
   background: transparent;
+  color: var(--color-text-primary);
+  border: var(--border-subtle);
+  padding: 12px 24px;
+  border-radius: var(--radius-pill);
+  font-weight: 500;
