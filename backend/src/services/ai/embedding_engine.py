@@ -16,3 +16,12 @@ class EmbeddingEngine:
             log.error(f"Failed to load sentence-transformer: {e}")
             raise
 
+    def generate_embedding(self, text: str) -> np.ndarray:
+        """Convert a single cleaned text string to a normalized dense vector."""
+        try:
+            vector = self.model.encode([text], convert_to_numpy=True)[0]
+            norm = np.linalg.norm(vector)
+            if norm > 0:
+                vector = vector / norm
+            return vector
+        except Exception as e:
