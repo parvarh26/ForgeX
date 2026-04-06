@@ -294,3 +294,11 @@ export default function Dashboard() {
             height: '40px', 
             background: i < clusters.length * 2 ? 'var(--accent-info)' : 'rgba(255,255,255,0.02)',
             opacity: i < clusters.length * 2 ? 0.2 + (Math.random() * 0.8) : 1,
+            borderRadius: '4px',
+            border: 'var(--border-subtle)'
+          }} />
+        ))}
+      </div>
+      <p style={{ marginTop: '32px', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
+        Visualizing vector density across the manifold. Shaded cells represent localized high-density incident regions (ε=0.28).
+      </p>
