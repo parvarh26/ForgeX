@@ -208,3 +208,8 @@ async def background_crawl(repo: str, db_factory):
                 db.add(db_issue)
         db.commit()
         log.info(f"Background crawl complete for {repo}. Cache warmed.")
+    except Exception as e:
+        log.error(f"Background crawl failed: {e}")
+    finally:
+        db.close()
+
