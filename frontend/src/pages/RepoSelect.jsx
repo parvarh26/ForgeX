@@ -64,3 +64,9 @@ export default function RepoSelect() {
         background: 'radial-gradient(circle, rgba(59,130,246,0.03) 0%, transparent 70%)',
         filter: 'blur(60px)', pointerEvents: 'none'
       }} />
+      <div style={{
+        position: 'absolute', bottom: '20%', right: '10%', width: '30%', height: '30%',
+        background: 'radial-gradient(circle, rgba(139,92,246,0.03) 0%, transparent 70%)',
+        filter: 'blur(60px)', pointerEvents: 'none'
+      }} />
+
