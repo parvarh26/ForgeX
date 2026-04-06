@@ -38,3 +38,11 @@ export default function Landing() {
         border: 'var(--border-subtle)',
         borderRadius: 'var(--radius-pill)',
         marginBottom: '40px',
+        fontSize: '0.8rem',
+        color: 'var(--color-text-secondary)',
+        backdropFilter: 'blur(10px)',
+        boxShadow: 'var(--shadow-elevated)'
+      }}>
+        <Zap size={14} color="var(--color-text-primary)" />
+        OpenIssue Intelligence Engine
+      </div>
