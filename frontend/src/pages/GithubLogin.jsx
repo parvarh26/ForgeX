@@ -47,3 +47,10 @@ export default function GithubLogin() {
           marginBottom: '32px',
           border: 'var(--border-subtle)'
         }}>
+          <Github size={40} color="var(--color-text-primary)" />
+        </div>
+        
+        <h2 style={{ marginBottom: '12px', fontSize: '1.5rem' }}>Authenticating</h2>
+        
+        <p style={{ color: 'var(--color-text-secondary)', marginBottom: '40px', fontSize: '0.9rem', lineHeight: 1.5 }}>
+          Establishing a secure handshake with the GitHub Intelligence API.
