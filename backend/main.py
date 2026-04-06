@@ -6,3 +6,11 @@ from src.core.exceptions import IntelligenceError, intelligence_exception_handle
 from src.api.routes import issues, clusters
 from src.api.routes import github, system
 from src.services.ai.vector_store import VectorStore
+from src.services.ai.embedding_engine import engine as embedder
+
+def create_app() -> FastAPI:
+    app = FastAPI(title=settings.PROJECT_NAME)
+    
+    # CORS specifically configured for the Vite Dev Server
+    app.add_middleware(
+        CORSMiddleware,
