@@ -108,3 +108,13 @@ async def stream_intelligence(repo, issues):
 
 #### [MODIFY] [RepoSelect.jsx](file:///Users/mac/Desktop/CHAINVOTE/frontend/src/pages/RepoSelect.jsx)
 - Replace mock repo list with a free-text `<input>` for `owner/repo`
+- Submit button with `onMouseEnter` → pre-fires `fetch("http://localhost:8000/health")` to warm the connection
+- On submit: store `repo` in `sessionStorage`, navigate to `/dashboard`
+
+---
+
+### Frontend — SSE Dashboard
+
+#### [MODIFY] [Dashboard.jsx](file:///Users/mac/Desktop/CHAINVOTE/frontend/src/pages/Dashboard.jsx)
+Complete rewrite from REST polling to SSE:
+- On mount: read `repo` from `sessionStorage`
