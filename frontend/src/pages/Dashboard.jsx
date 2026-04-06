@@ -174,3 +174,11 @@ export default function Dashboard() {
   useEffect(() => {
     startStream();
     return () => abortRef.current?.abort();
+  }, [repo]);
+
+  // Telemetry polling for System Status tab
+  useEffect(() => {
+    let interval;
+    if (navActive === 'Backend Status') {
+      const fetchStatus = () => {
+        fetch('http://localhost:8000/api/v1/system/status')
