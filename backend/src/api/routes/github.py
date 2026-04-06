@@ -198,3 +198,8 @@ async def background_crawl(repo: str, db_factory):
                 IssueModel.github_issue_id == raw["github_issue_id"]
             ).first()
             if not exists:
+                db_issue = IssueModel(
+                    repo_name=repo,
+                    github_issue_id=raw["github_issue_id"],
+                    title=raw["title"],
+                    body=raw["body"],
