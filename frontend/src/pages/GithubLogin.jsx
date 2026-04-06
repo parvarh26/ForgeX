@@ -54,3 +54,10 @@ export default function GithubLogin() {
         
         <p style={{ color: 'var(--color-text-secondary)', marginBottom: '40px', fontSize: '0.9rem', lineHeight: 1.5 }}>
           Establishing a secure handshake with the GitHub Intelligence API.
+        </p>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>
+          <Loader2 className="indicator-pulse" size={16} color="var(--color-text-muted)" style={{ animation: 'spin 1.5s linear infinite' }} />
+          Verifying session manifests...
+        </div>
+        
