@@ -13,3 +13,8 @@ class ClusteringEngine:
     def compute_clusters(self, vectors: np.ndarray, ids: list):
         """
         Runs DBSCAN on the vectors and returns a mapping of Cluster IDs to Issue DB IDs.
+        Cluster -1 is noise.
+        """
+        if len(vectors) == 0:
+            return {}
+
