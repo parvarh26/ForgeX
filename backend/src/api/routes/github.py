@@ -193,3 +193,8 @@ async def background_crawl(repo: str, db_factory):
         additional_issues = await github_service.fetch_issues(repo, limit=600)
         for raw in additional_issues:
             # Check if exists to avoid duplicates
+            exists = db.query(IssueModel).filter(
+                IssueModel.repo_name == repo,
+                IssueModel.github_issue_id == raw["github_issue_id"]
+            ).first()
+            if not exists:
