@@ -414,3 +414,11 @@ export default function Dashboard() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <CheckCircle2 size={20} color="var(--accent-success)" />
               <span style={{ fontSize: '0.95rem', color: 'var(--color-text-secondary)', fontWeight: 500 }}>Intelligence sweep finished.</span>
+            </div>
+            <button className="btn-outline" onClick={startStream} style={{ padding: '10px 24px', fontSize: '0.85rem' }}>Restart Pipeline</button>
+          </div>
+        )}
+
+        {hasError && (
+          <div className="stagger-1" style={{ marginTop: '24px', padding: '28px', background: 'rgba(255,69,58,0.03)', border: '1px solid rgba(255,69,58,0.15)', borderRadius: 'var(--radius-md)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}><XCircle size={20} color="var(--accent-critical)" /><p style={{ color: 'var(--accent-critical)', fontSize: '1rem', fontWeight: 600 }}>Pipeline Fault Detected</p></div>
