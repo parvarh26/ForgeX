@@ -26,3 +26,9 @@
 @keyframes softPulse {
   0% { opacity: 0.4; }
   50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
+.indicator-pulse {
+  animation: softPulse 2s ease-in-out infinite;
+}
