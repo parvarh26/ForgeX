@@ -123,3 +123,8 @@ async def _stream_intelligence(repo: str, db: Session):
                 if label == -1:
                     continue  # DBSCAN noise — skip
 
+                # Collect real text for meaningful LLM insight
+                context_texts = []
+                github_numbers = []
+                for db_id in group_ids:
+                    # Find the DB row by primary key
