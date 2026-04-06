@@ -183,3 +183,8 @@ async def _stream_intelligence(repo: str, db: Session):
 
 async def background_crawl(repo: str, db_factory):
     """
+    Background worker that fetches ALL remaining open issues and caches them.
+    """
+    log.info(f"Background crawl started for {repo}")
+    # We use a fresh session because the request session will be closed
+    db = db_factory()
