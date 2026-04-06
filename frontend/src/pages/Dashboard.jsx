@@ -166,3 +166,11 @@ export default function Dashboard() {
   const [hasError, setHasError]     = useState(false);
   const [progress, setProgress]     = useState({ processed: 0, total: 0 });
   const [navActive, setNavActive]   = useState('Intelligence');
+  const [systemStatus, setSystemStatus] = useState(null);
+  const abortRef = useRef(null);
+
+  const repo = sessionStorage.getItem('openissue_repo') || 'facebook/react';
+
+  useEffect(() => {
+    startStream();
+    return () => abortRef.current?.abort();
