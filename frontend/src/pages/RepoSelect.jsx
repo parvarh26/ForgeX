@@ -22,3 +22,9 @@ export default function RepoSelect() {
     if (!warmRef.current && repo.trim()) {
       warmRef.current = true;
       // Fire health ping to complete DNS + TLS handshake before user clicks
+      fetch('http://localhost:8000/health').catch(() => {});
+    }
+  };
+
+  const handleSync = () => {
+    if (!repo.trim()) {
