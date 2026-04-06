@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400" viewBox="0 0 1200 400">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0e1a;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0d1117;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#161b22;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="line-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#58a6ff;stop-opacity:0" />
+      <stop offset="50%" style="stop-color:#58a6ff;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#bc8cff;stop-opacity:0" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="400" fill="url(#bg)"/>
+  
+  <!-- Decorative network lines -->
+  <line x1="50" y1="80" x2="300" y2="150" stroke="#58a6ff" stroke-opacity="0.08" stroke-width="1"/>
+  <line x1="300" y1="150" x2="200" y2="300" stroke="#58a6ff" stroke-opacity="0.06" stroke-width="1"/>
+  <line x1="200" y1="300" x2="450" y2="350" stroke="#bc8cff" stroke-opacity="0.05" stroke-width="1"/>
+  <line x1="900" y1="60" x2="1050" y2="180" stroke="#58a6ff" stroke-opacity="0.08" stroke-width="1"/>
+  <line x1="1050" y1="180" x2="1150" y2="120" stroke="#bc8cff" stroke-opacity="0.06" stroke-width="1"/>
+  <line x1="1050" y1="180" x2="980" y2="320" stroke="#58a6ff" stroke-opacity="0.05" stroke-width="1"/>
+  <line x1="700" y1="50" x2="850" y2="100" stroke="#bc8cff" stroke-opacity="0.04" stroke-width="1"/>
+  <line x1="100" y1="350" x2="350" y2="380" stroke="#58a6ff" stroke-opacity="0.04" stroke-width="1"/>
+  
+  <!-- Decorative dots -->
+  <circle cx="50" cy="80" r="3" fill="#58a6ff" opacity="0.15"/>
+  <circle cx="300" cy="150" r="4" fill="#58a6ff" opacity="0.12"/>
+  <circle cx="200" cy="300" r="3" fill="#bc8cff" opacity="0.1"/>
+  <circle cx="450" cy="350" r="2" fill="#bc8cff" opacity="0.08"/>
+  <circle cx="900" cy="60" r="3" fill="#58a6ff" opacity="0.15"/>
+  <circle cx="1050" cy="180" r="4" fill="#58a6ff" opacity="0.12"/>
+  <circle cx="1150" cy="120" r="3" fill="#bc8cff" opacity="0.1"/>
+  <circle cx="980" cy="320" r="2" fill="#58a6ff" opacity="0.08"/>
+  <circle cx="700" cy="50" r="2" fill="#bc8cff" opacity="0.06"/>
+  <circle cx="850" cy="100" r="2" fill="#58a6ff" opacity="0.06"/>
+  
+  <!-- Accent line -->
+  <rect x="0" y="198" width="1200" height="1" fill="url(#line-grad)" opacity="0.4"/>
+  
+  <!-- Title -->
+  <text x="600" y="170" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="72" font-weight="800" fill="#ffffff" text-anchor="middle" filter="url(#glow)">OpenIssue</text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="230" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="22" font-weight="400" fill="#8b949e" text-anchor="middle">Intelligence Engine for GitHub Maintainers</text>
+  
+  <!-- Tagline -->
+  <text x="600" y="280" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#484f58" text-anchor="middle" letter-spacing="3">EMBED · CLUSTER · TRIAGE · SHIP</text>
+</svg>
