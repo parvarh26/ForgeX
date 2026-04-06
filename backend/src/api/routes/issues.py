@@ -40,3 +40,10 @@ async def ingest_issue(issue: IssueCreate, background_tasks: BackgroundTasks, db
             # Store it for future
             v_store.add_vector(db_issue.id, vector)
             
+            duplicate_count = len(duplicates)
+            similar_ids = [d['db_id'] for d in duplicates]
+        else:
+            duplicate_count = 0
+            similar_ids = []
+            
+        # Priority heuristic: more duplicates = higher priority score
