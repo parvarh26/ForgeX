@@ -52,3 +52,12 @@ class LLMService:
             if any(k in combined for k in ["memory", "leak", "oom", "heap", "crash"]):
                 return f"Memory pressure cluster detected — critical pattern in: {keyword_str}."
             if any(k in combined for k in ["mobile", "ios", "android", "viewport", "responsive"]):
+                return f"Mobile/viewport regression cluster — impacted surface: {keyword_str}."
+            if any(k in combined for k in ["type", "typescript", "lint", "build", "webpack", "vite"]):
+                return f"Toolchain / type-system cluster detected — pattern: {keyword_str}."
+
+            return f"Clustered defect pattern identified — primary signals: {keyword_str}."
+
+        # Real LLM call path (wired in future sprint)
+        log.warning("Real LLM endpoint not yet connected — returning keyword-extracted fallback.")
+        return f"AI-identified pattern cluster: {keyword_str}."
