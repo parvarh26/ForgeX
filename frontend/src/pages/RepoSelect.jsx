@@ -160,3 +160,9 @@ export default function RepoSelect() {
           id="sync-btn"
           className="btn-premium"
           onClick={handleSync}
+          onMouseEnter={handleSyncMouseEnter}
+          disabled={syncing}
+          style={{
+            width: '100%',
+            justifyContent: 'center',
+            padding: '16px',
