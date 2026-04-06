@@ -25,3 +25,12 @@ class EmbeddingEngine:
                 vector = vector / norm
             return vector
         except Exception as e:
+            log.error(f"Failed to generate embedding for text snippet: {e}")
+            raise
+
+    def generate_embeddings(self, texts: list) -> list:
+        """
+        Batch encode a list of text strings into normalized dense vectors.
+        This is the method handed off to run_in_threadpool for chunked processing
+        per plan.md §4.1 — isolates CPU-bound PyTorch math from the async event loop.
+        """
