@@ -222,3 +222,11 @@ export default function Dashboard() {
           setStatusMsg(payload.msg);
           setProgress({ processed: payload.processed, total: payload.total });
         }
+        if (type === 'cluster_found') {
+          setClusters(prev => {
+            const existing = prev.findIndex(c => c.cluster_label === payload.cluster_label);
+            if (existing >= 0) {
+              const next = [...prev];
+              next[existing] = { ...payload, repo };
+              return next;
+            }
