@@ -138,3 +138,8 @@ async def _stream_intelligence(repo: str, db: Session):
                 urgency = "Critical" if len(group_ids) >= 4 else "Medium"
 
                 cluster_key = f"{label}:{len(group_ids)}"
+                if seen_cluster_labels.get(label) != cluster_key:
+                    seen_cluster_labels[label] = cluster_key
+                    yield _sse_event({
+                        "type": "cluster_found",
+                        "payload": {
