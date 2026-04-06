@@ -130,3 +130,9 @@ export default function RepoSelect() {
             onChange={e => { setRepo(e.target.value); setError(''); warmRef.current = false; }}
             onKeyDown={handleKeyDown}
             placeholder="owner/repo"
+            disabled={syncing}
+            autoComplete="off"
+            spellCheck="false"
+            style={{
+              width: '100%',
+              padding: '16px 16px 16px 44px',
