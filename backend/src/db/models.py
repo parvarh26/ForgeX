@@ -25,3 +25,12 @@ class IssueModel(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 class ClusterModel(Base):
+    __tablename__ = "clusters"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    repo_name = Column(String, index=True, nullable=False, default="unknown")
+    summary_insight = Column(String)
+    size = Column(Integer)
+    urgency = Column(String)
+
+# Init DB — runs at import time to ensure schema is always current
