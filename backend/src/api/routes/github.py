@@ -243,6 +243,30 @@ async def sync_repository(request_data: SyncRequest, background_tasks: Backgroun
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no", "Connection": "keep-alive"}
     )
+    
+@router.get("/cluster/{id}")
+async def get_cluster_detail(id: int, repo: str, db: Session = Depends(get_db)):
+    """
+    Direct fetch for cluster details when hot session cache is cold (e.g. deep-link).
+    """
+    cluster = db.query(ClusterModel).filter(
+        ClusterModel.repo_name == repo, 
+        ClusterModel.cluster_label == id
+    ).first()
+    if not cluster:
+        raise HTTPException(status_code=404, detail="Cluster not found")
+        
+    return {
+        "cluster_label": cluster.cluster_label,
+        "insight": cluster.summary_insight,
+        "llm_summary": cluster.llm_full_analysis,
+        "similarity_score": f"{cluster.similarity_score}%",
+        "issue_count": cluster.size,
+        "urgency": cluster.urgency,
+        "github_issue_numbers": [int(n) for n in (cluster.github_issue_numbers.split(",") if cluster.github_issue_numbers else [])],
+        "repo": repo
+    }
+
 
 
 

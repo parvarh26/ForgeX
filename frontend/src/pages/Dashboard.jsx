@@ -74,7 +74,7 @@ function StatusPill({ msg, streaming, complete, hasError }) {
   );
 }
 
-function ClusterCard({ cluster, index, navigate, onPreview }) {
+function ClusterCard({ cluster, index, navigate, onPreview, repoOwner, repoName }) {
   const isCritical = cluster.urgency === 'Critical';
   return (
     <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', borderTop: index === 0 ? 'none' : '1px solid #30363d', background: '#0d1117' }}>
@@ -82,7 +82,7 @@ function ClusterCard({ cluster, index, navigate, onPreview }) {
         <svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor"><path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" /><path fillRule="evenodd" d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z" /></svg>
       </div>
       <div
-        onClick={() => navigate(`/cluster/${cluster.cluster_label}`)}
+        onClick={() => navigate(`/cluster/${repoOwner}/${repoName}/${cluster.cluster_label}`)}
         style={{ marginLeft: '12px', flex: 1, minWidth: 0, cursor: 'pointer', animation: 'fadeUpIn 300ms ease both', animationDelay: `${Math.min(index * 12, 250)}ms` }}
         onMouseEnter={e => e.currentTarget.parentElement.style.background = '#161b22'}
         onMouseLeave={e => e.currentTarget.parentElement.style.background = '#0d1117'}
@@ -312,6 +312,7 @@ function DashboardInner() {
   const mountedRef = useRef(true);
 
   const repo = sessionStorage.getItem('openissue_repo') || 'facebook/react';
+  const [owner, repoName] = repo.split('/');
 
   // Cleanup on unmount
   useEffect(() => {
@@ -473,7 +474,15 @@ function DashboardInner() {
             {clusters.length > 100 && <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#8b949e', fontWeight: 400 }}>Showing top 100</span>}
           </div>
           {clusters.slice(0, 100).map((c, idx) => (
-            <ClusterCard key={c.cluster_label || idx} cluster={c} index={idx} navigate={navigate} onPreview={setPreviewCluster} />
+            <ClusterCard 
+              key={c.cluster_label || idx} 
+              cluster={c} 
+              index={idx} 
+              navigate={navigate} 
+              onPreview={setPreviewCluster} 
+              repoOwner={owner}
+              repoName={repoName}
+            />
           ))}
         </div>
       ) : streaming ? (

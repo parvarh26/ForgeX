@@ -5,44 +5,63 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 export default function ClusterDetail() {
-  const { id } = useParams();
+  const { owner, repoName, id } = useParams();
   const navigate = useNavigate();
   const [clusterInfo, setClusterInfo] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const fullRepo = owner && repoName ? `${owner}/${repoName}` : (sessionStorage.getItem('openissue_repo') || 'facebook/react');
+
   useEffect(() => {
-    try {
-      const stored = sessionStorage.getItem('openissue_clusters');
-      if (stored) {
-        const clusters = JSON.parse(stored);
-        const match = clusters.find(c => String(c.cluster_label) === String(id));
-        
-        if (match) {
+    const loadCluster = async () => {
+      setLoading(true);
+      try {
+        // 1. Try to find in session cache first (warm cache)
+        const stored = sessionStorage.getItem('openissue_clusters');
+        if (stored) {
+          const clusters = JSON.parse(stored);
+          const match = clusters.find(c => String(c.cluster_label) === String(id));
+          if (match) {
+            setClusterInfo({
+              ...match,
+              repo: fullRepo,
+            });
+            setLoading(false);
+            return;
+          }
+        }
+
+        // 2. Fallback to backend fetch (cold cache / deep-link)
+        const resp = await fetch(`http://localhost:8000/api/v1/github/cluster/${id}?repo=${encodeURIComponent(fullRepo)}`);
+        if (resp.ok) {
+          const data = await resp.json();
           setClusterInfo({
-            ...match,
-            repo: sessionStorage.getItem('openissue_repo') || 'unknown/repo',
+            ...data,
+            repo: fullRepo,
           });
           setLoading(false);
           return;
         }
+      } catch (e) {
+        console.error("Pipeline discovery failure:", e);
       }
-    } catch (e) {
-      console.error("Failed to decode cluster geometry", e);
-    }
 
-    // Fallback if accessed via direct URL without a hot cache
-    setClusterInfo({
-      cluster_label: id,
-      insight: "Cluster Not Found or Session Expired",
-      urgency: "Unknown",
-      issue_count: 0,
-      repo: sessionStorage.getItem('openissue_repo') || 'unknown/repo',
-      github_issue_numbers: [],
-      llm_summary: "The semantic matrix requires a warm cache to display cluster topologies. Please return to the Dashboard.",
-      similarity_score: "N/A",
-    });
-    setLoading(false);
-  }, [id]);
+      // 3. Absolute fallback for non-existent clusters
+      setClusterInfo({
+        cluster_label: id,
+        insight: "Cluster Not Found",
+        urgency: "Unknown",
+        issue_count: 0,
+        repo: fullRepo,
+        github_issue_numbers: [],
+        llm_summary: "The intelligence matrix could not locate this cluster label. This may happen if the backend cache was flushed or the cluster was reassigned during a re-sync.",
+        similarity_score: "N/A",
+      });
+      setLoading(false);
+    };
+
+    loadCluster();
+  }, [owner, repoName, id, fullRepo]);
 
   if (loading) {
     return (

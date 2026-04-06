@@ -16,6 +16,7 @@ export default function App() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/dashboard/:owner/:repoName" element={<Dashboard />} />
       <Route path="/cluster/:id" element={<ClusterDetail />} />
+      <Route path="/cluster/:owner/:repoName/:id" element={<ClusterDetail />} />
       <Route path="/search" element={<SearchResults />} />
     </Routes>
   );
