@@ -30,6 +30,7 @@ trap cleanup SIGINT SIGTERM EXIT
 # 1. Start Backend
 echo -e "${GREEN}📦 [1/2] Starting FastAPI Backend on port 8000...${NC}"
 cd backend
+source venv/bin/activate
 python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload > ../backend.log 2>&1 &
 BACKEND_PID=$!
 cd ..
