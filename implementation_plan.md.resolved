@@ -78,3 +78,13 @@ async def stream_intelligence(repo, issues):
         # Add to ephemeral FAISS
         for i, vec in enumerate(vectors):
             v_store.add_vector(batch[i]['id'], vec)
+        
+        # Run DBSCAN on all accumulated vectors so far
+        all_vecs, all_ids = v_store.get_all_vectors()
+        clusters = clusterer.compute_clusters(all_vecs, all_ids)
+        
+        for label, group_ids in clusters.items():
+            if label == -1: continue
+            yield f'data: {json.dumps({"type": "cluster_found", "payload": {...}})}\n\n'
+    
+    yield 'data: {"type": "complete"}\n\n'
