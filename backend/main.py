@@ -32,7 +32,23 @@ def create_app() -> FastAPI:
     @app.on_event("startup")
     async def startup_event():
         log.info("Booting Intelligence Pipeline...")
-        # Systems are now auto-initializing via persistent global stores
+        # FIX: Crash recovery — any sync marked 'syncing' in DB means the server
+        # was killed mid-crawl. Mark them as 'failed' so the UI knows to re-sync.
+        try:
+            from src.db.models import SessionLocal, SyncState
+            db = SessionLocal()
+            try:
+                stuck = db.query(SyncState).filter(SyncState.status == "syncing").all()
+                if stuck:
+                    for s in stuck:
+                        log.warning(f"[startup] Found crashed sync for '{s.repo_name}', marking failed.")
+                        s.status = "failed"
+                        s.last_error = "Server restarted while sync was in progress"
+                    db.commit()
+            finally:
+                db.close()
+        except Exception as e:
+            log.warning(f"[startup] Could not run sync recovery: {e}")
 
 
     @app.get("/health")

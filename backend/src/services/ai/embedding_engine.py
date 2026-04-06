@@ -1,5 +1,6 @@
 from sentence_transformers import SentenceTransformer
 import numpy as np
+import threading
 from src.core.logger import setup_logger
 from src.core.config import settings
 
@@ -31,8 +32,7 @@ class EmbeddingEngine:
     def generate_embeddings(self, texts: list) -> list:
         """
         Batch encode a list of text strings into normalized dense vectors.
-        This is the method handed off to run_in_threadpool for chunked processing
-        per plan.md §4.1 — isolates CPU-bound PyTorch math from the async event loop.
+        Called via run_in_threadpool() to isolate CPU-bound PyTorch from the async event loop.
         """
         try:
             log.info(f"Batch encoding {len(texts)} texts in thread-pool...")
@@ -46,5 +46,28 @@ class EmbeddingEngine:
             log.error(f"Batch embedding failed: {e}")
             raise
 
-# Singleton instance for the workers to use
-engine = EmbeddingEngine()
+
+# FIX: Lazy singleton — defer model loading until first use.
+# Previously: engine = EmbeddingEngine() at import time → if model download fails,
+# the entire backend crashes on startup with no health endpoint available.
+# Now: model loads on first call; server starts cleanly even without connectivity.
+_engine_instance: EmbeddingEngine | None = None
+_engine_lock = threading.Lock()
+
+def get_embedding_engine() -> EmbeddingEngine:
+    """Thread-safe lazy initialization of the embedding model singleton."""
+    global _engine_instance
+    if _engine_instance is None:
+        with _engine_lock:
+            if _engine_instance is None:  # Double-checked locking
+                _engine_instance = EmbeddingEngine()
+    return _engine_instance
+
+# Back-compat alias for code that imports `engine` directly
+# (embedding_engine.py used to export `engine = EmbeddingEngine()`)
+class _LazyEngineProxy:
+    """Transparent proxy to the lazy singleton so existing `engine.xxx` calls work unchanged."""
+    def __getattr__(self, name):
+        return getattr(get_embedding_engine(), name)
+
+engine = _LazyEngineProxy()
