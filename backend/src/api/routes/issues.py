@@ -47,3 +47,10 @@ async def ingest_issue(issue: IssueCreate, background_tasks: BackgroundTasks, db
             similar_ids = []
             
         # Priority heuristic: more duplicates = higher priority score
+        score = 0.5 + (duplicate_count * 0.2)
+        db_issue.priority_score = score
+        db.commit()
+        
+        return IssueResponse(
+            id=db_issue.id,
+            title=db_issue.title,
