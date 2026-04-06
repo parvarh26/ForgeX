@@ -7,3 +7,11 @@ import Dashboard from './pages/Dashboard';
 
 export default function App() {
   return (
+    <Routes>
+      <Route path="/" element={<Landing />} />
+      <Route path="/login" element={<GithubLogin />} />
+      <Route path="/select-repo" element={<RepoSelect />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+    </Routes>
+  );
+}
