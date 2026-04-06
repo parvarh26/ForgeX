@@ -13,3 +13,8 @@ from src.services.ai.vector_store import VectorStore
 from src.services.ai.clustering_engine import clusterer
 from src.services.ai.llm_service import llm
 from src.core.logger import log
+
+router = APIRouter()
+
+
+class SyncRequest(BaseModel):
