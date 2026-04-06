@@ -5,6 +5,7 @@ import GithubLogin from './pages/GithubLogin';
 import RepoSelect from './pages/RepoSelect';
 import Dashboard from './pages/Dashboard';
 import ClusterDetail from './pages/ClusterDetail';
+import IssueDetail from './pages/IssueDetail';
 import SearchResults from './pages/SearchResults';
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
       <Route path="/dashboard/:owner/:repoName" element={<Dashboard />} />
       <Route path="/cluster/:id" element={<ClusterDetail />} />
       <Route path="/cluster/:owner/:repoName/:id" element={<ClusterDetail />} />
+      <Route path="/issue/:owner/:repoName/:number" element={<IssueDetail />} />
       <Route path="/search" element={<SearchResults />} />
     </Routes>
   );

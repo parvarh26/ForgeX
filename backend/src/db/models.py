@@ -49,6 +49,21 @@ class ClusterModel(Base):
     similarity_score = Column(Float)
     github_issue_numbers = Column(String) # Comma-separated list
 
+class IssueTriage(Base):
+    __tablename__ = "issue_triage"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    repo_name = Column(String, index=True, nullable=False)
+    issue_number = Column(Integer, index=True, nullable=False)
+    priority = Column(String, nullable=True)          # p0, p1, p2, p3
+    triage_status = Column(String, default="needs-triage")  # needs-triage, triaged, needs-repro, backlog
+    bookmarked = Column(Integer, default=0)           # 0 or 1
+    pinned = Column(Integer, default=0)               # 0 or 1
+    locked = Column(Integer, default=0)               # 0 or 1
+    linked_pr = Column(String, nullable=True)         # PR number if linked
+    notes = Column(String, nullable=True)             # Internal notes
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
 # Init DB — runs at import time to ensure schema is always current
 Base.metadata.create_all(bind=engine)
 

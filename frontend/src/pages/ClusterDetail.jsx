@@ -161,32 +161,38 @@ export default function ClusterDetail() {
 
             <h3 style={{ fontSize: '16px', margin: '40px 0 16px 0', fontWeight: 600, color: '#c9d1d9' }}>Incidents in Cluster</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {(clusterInfo.github_issue_numbers || []).map((num, idx) => (
-                <a 
-                  key={`${num}-${idx}`}
-                  href={`https://github.com/${clusterInfo.repo}/issues/${num}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'space-between',
-                    padding: '12px 16px', 
-                    background: '#161b22', 
-                    border: '1px solid #30363d',
-                    borderRadius: '6px',
-                    textDecoration: 'none',
-                    color: '#c9d1d9',
-                    fontSize: '14px',
-                    transition: 'background-color 0.2s'
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.background = '#21262d'}
-                  onMouseLeave={e => e.currentTarget.style.background = '#161b22'}
-                >
-                  <span style={{ fontWeight: 500 }}>Issue #{num}</span>
-                  <ExternalLink size={14} color="#8b949e" />
-                </a>
-              ))}
+              {[...new Set(clusterInfo.github_issue_numbers || [])].map((num, idx) => {
+                const [issOwner, issRepo] = fullRepo.split('/');
+                const issPath = `/issue/${issOwner}/${issRepo}/${num}`;
+                return (
+                  <div
+                    key={`${num}-${idx}`}
+                    onClick={() => navigate(issPath)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '12px 16px',
+                      background: '#161b22',
+                      border: '1px solid #30363d',
+                      borderRadius: '6px',
+                      textDecoration: 'none',
+                      color: '#c9d1d9',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = '#21262d'; e.currentTarget.style.borderColor = '#58a6ff55'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = '#161b22'; e.currentTarget.style.borderColor = '#30363d'; }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <svg viewBox="0 0 16 16" width="14" height="14" fill="#3fb950"><path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/><path fillRule="evenodd" d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"/></svg>
+                      <span style={{ fontWeight: 500 }}>Issue #{num}</span>
+                    </div>
+                    <ExternalLink size={14} color="#8b949e" />
+                  </div>
+                );
+              })}
             </div>
           </div>
 

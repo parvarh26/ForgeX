@@ -8,7 +8,7 @@ from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
-from src.db.models import get_db, IssueModel, ClusterModel, SessionLocal
+from src.db.models import get_db, IssueModel, ClusterModel, IssueTriage, SessionLocal
 from src.services.github.github_service import github_service
 from src.services.ai.embedding_engine import engine as embedder
 from src.services.ai.vector_store import VectorStore
@@ -271,7 +271,150 @@ async def get_cluster_detail(id: int, repo: str, db: Session = Depends(get_db)):
 
 
 
+# ── Real Maintainer Action Endpoints ─────────────────────────────────────────
+
+@router.delete("/cluster/{cluster_id}/issue/{issue_number}")
+async def remove_issue_from_cluster(cluster_id: int, issue_number: int, repo: str, db: Session = Depends(get_db)):
+    """
+    Removes a specific issue number from a cluster's tracked GitHub issue list.
+    Updates the cluster in-place; a full re-sync will not restore this unless re-clustered.
+    """
+    cluster = db.query(ClusterModel).filter(
+        ClusterModel.repo_name == repo,
+        ClusterModel.cluster_label == cluster_id
+    ).first()
+    if not cluster:
+        raise HTTPException(status_code=404, detail="Cluster not found")
+    
+    nums = [int(n) for n in (cluster.github_issue_numbers.split(",") if cluster.github_issue_numbers else []) if n.strip().isdigit()]
+    if issue_number not in nums:
+        raise HTTPException(status_code=404, detail="Issue not in this cluster")
+    
+    nums.remove(issue_number)
+    cluster.github_issue_numbers = ",".join(str(n) for n in nums)
+    cluster.size = len(nums)
+    db.commit()
+    return {"status": "removed", "cluster_id": cluster_id, "issue_number": issue_number, "remaining": len(nums)}
+
+
+@router.post("/cluster/{cluster_id}/reanalyze")
+async def reanalyze_cluster(cluster_id: int, repo: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    """
+    Queues a background re-analysis for a specific cluster using the AI LLM service.
+    """
+    from src.services.ai.llm_service import llm
+    cluster = db.query(ClusterModel).filter(
+        ClusterModel.repo_name == repo,
+        ClusterModel.cluster_label == cluster_id
+    ).first()
+    if not cluster:
+        raise HTTPException(status_code=404, detail="Cluster not found")
+
+    def _reanalyze(cluster_id_: int, repo_: str):
+        db2 = SessionLocal()
+        try:
+            c = db2.query(ClusterModel).filter(ClusterModel.repo_name == repo_, ClusterModel.cluster_label == cluster_id_).first()
+            if c:
+                keywords = (c.summary_insight or "").split()[:5]
+                new_insight = llm.generate_cluster_insight(keywords)
+                c.summary_insight = new_insight
+                c.llm_full_analysis = new_insight
+                db2.commit()
+        finally:
+            db2.close()
+
+    background_tasks.add_task(_reanalyze, cluster_id, repo)
+    return {"status": "queued", "cluster_id": cluster_id, "message": "Re-analysis running in background"}
+
+
+# ── Triage CRUD ───────────────────────────────────────────────────────────────
+
+class TriagePayload(BaseModel):
+    priority: str | None = None
+    triage_status: str | None = None
+    bookmarked: bool | None = None
+    pinned: bool | None = None
+    locked: bool | None = None
+    linked_pr: str | None = None
+    notes: str | None = None
+
+@router.get("/triage/{issue_number}")
+async def get_triage(issue_number: int, repo: str, db: Session = Depends(get_db)):
+    t = db.query(IssueTriage).filter(IssueTriage.repo_name == repo, IssueTriage.issue_number == issue_number).first()
+    if not t:
+        return {"issue_number": issue_number, "repo": repo, "priority": None, "triage_status": "needs-triage", "bookmarked": False, "pinned": False, "locked": False, "linked_pr": None, "notes": None}
+    return {"issue_number": t.issue_number, "repo": t.repo_name, "priority": t.priority, "triage_status": t.triage_status, "bookmarked": bool(t.bookmarked), "pinned": bool(t.pinned), "locked": bool(t.locked), "linked_pr": t.linked_pr, "notes": t.notes}
+
+@router.patch("/triage/{issue_number}")
+async def update_triage(issue_number: int, repo: str, payload: TriagePayload, db: Session = Depends(get_db)):
+    t = db.query(IssueTriage).filter(IssueTriage.repo_name == repo, IssueTriage.issue_number == issue_number).first()
+    if not t:
+        t = IssueTriage(repo_name=repo, issue_number=issue_number)
+        db.add(t)
+    if payload.priority is not None: t.priority = payload.priority
+    if payload.triage_status is not None: t.triage_status = payload.triage_status
+    if payload.bookmarked is not None: t.bookmarked = int(payload.bookmarked)
+    if payload.pinned is not None: t.pinned = int(payload.pinned)
+    if payload.locked is not None: t.locked = int(payload.locked)
+    if payload.linked_pr is not None: t.linked_pr = payload.linked_pr
+    if payload.notes is not None: t.notes = payload.notes
+    db.commit()
+    return {"status": "updated", "issue_number": issue_number}
+
+@router.get("/issue/{number}")
+async def get_issue_detail(number: int, repo: str):
+    """
+    Fetches full issue details + comments from GitHub API.
+    """
+    headers = github_service._build_headers()
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        issue_resp = await client.get(
+            f"https://api.github.com/repos/{repo}/issues/{number}",
+            headers=headers
+        )
+        if issue_resp.status_code == 404:
+            raise HTTPException(status_code=404, detail="Issue not found")
+        if issue_resp.status_code != 200:
+            raise HTTPException(status_code=issue_resp.status_code, detail="GitHub API error")
+        issue = issue_resp.json()
+
+        comments_resp = await client.get(
+            f"https://api.github.com/repos/{repo}/issues/{number}/comments",
+            headers=headers,
+            params={"per_page": 100}
+        )
+        comments = comments_resp.json() if comments_resp.status_code == 200 else []
+
+    def fmt_user(u):
+        if not u: return {"login": "ghost", "avatar_url": ""}
+        return {"login": u.get("login", "ghost"), "avatar_url": u.get("avatar_url", ""), "html_url": u.get("html_url", "")}
+
+    return {
+        "number": issue.get("number"),
+        "title": issue.get("title", ""),
+        "state": issue.get("state", "open"),
+        "body": issue.get("body") or "",
+        "created_at": issue.get("created_at"),
+        "updated_at": issue.get("updated_at"),
+        "user": fmt_user(issue.get("user")),
+        "labels": [{"name": l["name"], "color": l.get("color", "888")} for l in issue.get("labels", [])],
+        "assignees": [fmt_user(a) for a in issue.get("assignees", [])],
+        "comments_count": issue.get("comments", 0),
+        "html_url": issue.get("html_url", ""),
+        "repo": repo,
+        "comments": [
+            {
+                "id": c["id"],
+                "body": c.get("body") or "",
+                "created_at": c.get("created_at"),
+                "user": fmt_user(c.get("user")),
+            }
+            for c in comments
+        ],
+    }
+
 @router.delete("/repo")
+
 async def flush_intelligence(repo: str, db: Session = Depends(get_db)):
     db.query(IssueModel).filter(IssueModel.repo_name == repo).delete()
     db.query(ClusterModel).filter(ClusterModel.repo_name == repo).delete()
