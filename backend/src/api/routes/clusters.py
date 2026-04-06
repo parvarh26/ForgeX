@@ -34,3 +34,12 @@ async def get_clusters():
         
         urgency = "Critical" if len(group_ids) >= 3 else "Medium"
         
+        results.append(ClusterInsightResponse(
+            cluster_id=cluster_id_counter,
+            issue_count=len(group_ids),
+            insight=insight,
+            urgency=urgency,
+            issues=[{"id": idx} for idx in group_ids]
+        ))
+        cluster_id_counter += 1
+        
