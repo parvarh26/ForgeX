@@ -43,3 +43,12 @@ class VectorStore:
                 if idx != -1: 
                     score_percentage = float(distances[0][i])
                     # If same item returns identical score 1.0, we can filter downstream
+                    results.append({
+                        "db_id": self.id_map[idx],
+                        "similarity_score": score_percentage
+                    })
+            return results
+        except Exception as e:
+            log.error(f"FAISS search failed: {e}")
+            return []
+
