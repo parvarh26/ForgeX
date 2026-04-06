@@ -38,3 +38,13 @@ Full codebase assessed. The foundation is solid: FastAPI + FAISS + DBSCAN + Sent
 
 ---
 
+### Backend — GitHub Integration Service
+
+#### [NEW] `backend/src/services/github/__init__.py`
+
+#### [NEW] `backend/src/services/github/github_service.py`
+- `async def fetch_issues(repo: str, token: Optional[str]) -> list[dict]`
+- Uses `httpx.AsyncClient` to call `https://api.github.com/repos/{repo}/issues?state=open&per_page=50`
+- Returns structured list of `{id, title, body, number}`
+- Rate-limit aware with proper error handling
+
