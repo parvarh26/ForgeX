@@ -70,3 +70,11 @@ function ClusterCard({ cluster, index }) {
     >
       {/* Critical red accent stripe */}
       {isCritical && (
+        <div style={{
+          position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px',
+          background: 'var(--accent-critical)',
+          opacity: 0.8
+        }} />
+      )}
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
