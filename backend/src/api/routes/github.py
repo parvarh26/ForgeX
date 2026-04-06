@@ -53,3 +53,8 @@ async def _stream_intelligence(repo: str, db: Session):
             "payload": {"msg": f"Tenant namespace cleared. Fetching live issues from github.com/{repo}..."}
         })
 
+        # ── GITHUB FETCH ───────────────────────────────────────────────────────
+        try:
+            # Plan updated: Industrial Scale default is 200
+            raw_issues = await github_service.fetch_issues(repo, limit=200)
+        except ValueError as e:
