@@ -38,3 +38,8 @@ async def _stream_intelligence(repo: str, db: Session):
     6. Signal completion
     """
 
+    try:
+        # ── STATUS: Pipeline boot ──────────────────────────────────────────────
+        yield _sse_event({
+            "type": "status",
+            "payload": {"msg": f"Pipeline initialized for {repo}. Booting intelligence layers..."}
