@@ -58,3 +58,9 @@ export default function RepoSelect() {
       overflow: 'hidden'
     }}>
 
+      {/* Backdrop Ambient Lights */}
+      <div style={{
+        position: 'absolute', top: '20%', left: '10%', width: '30%', height: '30%',
+        background: 'radial-gradient(circle, rgba(59,130,246,0.03) 0%, transparent 70%)',
+        filter: 'blur(60px)', pointerEvents: 'none'
+      }} />
