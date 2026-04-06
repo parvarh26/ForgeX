@@ -16,3 +16,9 @@ export default function RepoSelect() {
   const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState('');
   const warmRef = useRef(false);
+
+  // plan.md §3.2 — onMouseEnter pre-fetch: warm the connection before click resolves
+  const handleSyncMouseEnter = () => {
+    if (!warmRef.current && repo.trim()) {
+      warmRef.current = true;
+      // Fire health ping to complete DNS + TLS handshake before user clicks
