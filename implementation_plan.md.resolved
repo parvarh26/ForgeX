@@ -68,3 +68,13 @@ Flow:
 
 Inside the generator:
 ```python
+async def stream_intelligence(repo, issues):
+    yield 'data: {"type": "status", "payload": {"msg": "Pipeline initialized"}}\n\n'
+    
+    for idx in range(0, len(issues), 16):    # chunk mod 16
+        batch = issues[idx:idx+16]
+        vectors = await run_in_threadpool(embedder.generate_embeddings, batch)
+        
+        # Add to ephemeral FAISS
+        for i, vec in enumerate(vectors):
+            v_store.add_vector(batch[i]['id'], vec)
