@@ -108,3 +108,8 @@ async def _stream_intelligence(repo: str, db: Session):
             for i, vec in enumerate(vectors):
                 raw_issue = batch_raw[i]
                 db_row = db_issue_map.get(raw_issue["github_issue_id"])
+                if db_row:
+                    v_store.add_vector(db_row.id, vec)
+
+            # ── DBSCAN after each chunk ──────────────────────────────────────
+            all_vecs, all_ids = v_store.get_all_vectors()
