@@ -48,3 +48,13 @@ Full codebase assessed. The foundation is solid: FastAPI + FAISS + DBSCAN + Sent
 - Returns structured list of `{id, title, body, number}`
 - Rate-limit aware with proper error handling
 
+---
+
+### Backend — SSE Streaming Route
+
+#### [NEW] `backend/src/api/routes/github.py`
+Core of the plan. Contains:
+
+```python
+POST /api/v1/github/sync
+```
