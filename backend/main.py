@@ -22,3 +22,11 @@ def create_app() -> FastAPI:
 
     # Global Exception Handlers (SDE-3 practice)
     app.add_exception_handler(IntelligenceError, intelligence_exception_handler)
+    app.add_exception_handler(Exception, global_exception_handler)
+
+    # Routes
+    app.include_router(issues.router, prefix="/api/v1/issues", tags=["Issues"])
+    app.include_router(clusters.router, prefix="/api/v1/clusters", tags=["Clusters"])
+    # SSE streaming GitHub sync — the core of plan.md
+    app.include_router(github.router, prefix="/api/v1/github", tags=["GitHub"])
+    # System telemetry for Dashboard status
