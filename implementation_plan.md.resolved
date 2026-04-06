@@ -138,3 +138,13 @@ Complete rewrite from REST polling to SSE:
 
 ## Verification Plan
 
+### Automated
+```bash
+# Backend starts clean
+cd backend && python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+# Health endpoint
+curl http://localhost:8000/health
+
+# SSE sync endpoint (requires GitHub token or public repo)
+curl -N -X POST http://localhost:8000/api/v1/github/sync \
