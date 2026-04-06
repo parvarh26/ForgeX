@@ -406,3 +406,11 @@ export default function Dashboard() {
 
         {navActive === 'Intelligence' && renderIntelligence()}
         {navActive === 'Spatial Matrix' && renderSpatialMatrix()}
+        {navActive === 'Vector Index' && renderVectorIndex()}
+        {navActive === 'Backend Status' && renderSystemStatus()}
+
+        {complete && navActive === 'Intelligence' && (
+          <div className="stagger-3" style={{ marginTop: '48px', padding: '24px', background: 'rgba(50,215,75,0.03)', border: '1px solid rgba(50,215,75,0.1)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <CheckCircle2 size={20} color="var(--accent-success)" />
+              <span style={{ fontSize: '0.95rem', color: 'var(--color-text-secondary)', fontWeight: 500 }}>Intelligence sweep finished.</span>
