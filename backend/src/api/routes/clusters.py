@@ -16,3 +16,12 @@ async def get_clusters():
         return []
         
     vectors, ids = v_store.get_all_vectors()
+    
+    cluster_map = clusterer.compute_clusters(vectors, ids)
+    
+    results = []
+    
+    # We must fetch the actual text for the LLM from the DB. 
+    # For speed in simulation, we will mock the LLM context fetching here.
+    cluster_id_counter = 1
+    for label, group_ids in cluster_map.items():
