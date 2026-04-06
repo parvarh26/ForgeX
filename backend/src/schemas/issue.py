@@ -10,3 +10,9 @@ class IssueCreate(BaseModel):
             "example": {
                 "title": "Timeout on checkout page",
                 "body": "When users try to pay, the gateway times out returning 504."
+            }
+        }
+    )
+
+class IssueResponse(BaseModel):
+    id: int
