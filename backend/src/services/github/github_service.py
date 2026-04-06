@@ -38,3 +38,11 @@ class GitHubService:
 
         all_cleaned = []
         page = 1
+        per_page = 100 # GitHub max
+
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            while len(all_cleaned) < limit:
+                url = f"{GITHUB_API_BASE}/repos/{repo}/issues"
+                params = {
+                    "state": "open",
+                    "per_page": per_page,
