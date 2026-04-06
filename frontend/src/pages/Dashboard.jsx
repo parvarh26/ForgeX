@@ -270,3 +270,11 @@ export default function Dashboard() {
           ))}
         </div>
       )}
+
+      {/* Cluster Feed */}
+      {clusters.length > 0 ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {clusters.map((cluster, idx) => <ClusterCard key={cluster.cluster_label} cluster={cluster} index={idx} />)}
+        </div>
+      ) : streaming && (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', padding: '100px 0', color: 'var(--color-text-muted)' }}>
