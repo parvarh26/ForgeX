@@ -286,3 +286,11 @@ export default function Dashboard() {
   );
 
   const renderSpatialMatrix = () => (
+    <div className="surface-card stagger-1" style={{ padding: '40px' }}>
+      <h2 style={{ marginBottom: '32px' }}>DBSCAN Spatial Density</h2>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '10px' }}>
+        {Array.from({ length: 40 }).map((_, i) => (
+          <div key={i} style={{ 
+            height: '40px', 
+            background: i < clusters.length * 2 ? 'var(--accent-info)' : 'rgba(255,255,255,0.02)',
+            opacity: i < clusters.length * 2 ? 0.2 + (Math.random() * 0.8) : 1,
