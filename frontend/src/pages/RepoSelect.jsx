@@ -142,3 +142,9 @@ export default function RepoSelect() {
               color: 'var(--color-text-primary)',
               fontSize: '1rem',
               fontFamily: 'inherit',
+              outline: 'none',
+              transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+            onFocus={e => { if (!error) e.target.style.borderColor = 'rgba(255,255,255,0.2)'; e.target.style.background = 'rgba(255,255,255,0.05)'; }}
+            onBlur={e => { if (!error) e.target.style.borderColor = 'var(--border-subtle)'; e.target.style.background = 'rgba(255,255,255,0.03)'; }}
+          />
