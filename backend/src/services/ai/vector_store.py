@@ -61,3 +61,11 @@ class VectorStore:
         vectors = np.array([self.index.reconstruct(i) for i in range(self.index.ntotal)])
         return vectors, self.id_map
 
+    def save_index(self):
+        log.warning("Saving FAISS index state to disk is mocked for demo scale.")
+        
+    def load_index(self):
+        log.info("Initialized ephemeral FAISS index.")
+
+# This will be dependency injected with the engine dimension
+store = None
