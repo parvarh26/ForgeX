@@ -382,3 +382,11 @@ export default function Dashboard() {
         </div>
       </aside>
 
+      <main style={{ padding: '48px 60px', maxWidth: '1200px', width: '100%', position: 'relative' }}>
+        <div style={{ position: 'fixed', top: '10%', right: '10%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(59,130,246,0.03) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px', position: 'relative', zIndex: 1 }}>
+          <div>
+            <h1 style={{ fontSize: '2rem', marginBottom: '8px', letterSpacing: '-0.04em', fontWeight: 600 }}>{navActive}</h1>
+            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem', letterSpacing: '0.01em' }}>{repo} · Live Intelligence Stream</p>
+          </div>
+          <StatusPill msg={statusMsg} streaming={streaming} complete={complete} hasError={hasError} />
