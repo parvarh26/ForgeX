@@ -68,3 +68,8 @@ button {
   transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.btn-premium:hover {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
