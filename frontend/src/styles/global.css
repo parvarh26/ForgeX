@@ -58,3 +58,8 @@ button {
 .btn-premium {
   display: inline-flex;
   align-items: center;
+  gap: 12px;
+  background: var(--color-text-primary);
+  color: var(--color-base);
+  padding: 12px 24px;
+  border-radius: var(--radius-pill);
