@@ -19,3 +19,10 @@ export default function GithubLogin() {
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
+      alignItems: 'center',
+      background: 'radial-gradient(circle at center, #0a0a0a 0%, #000000 100%)',
+    }}>
+      
+      {/* Background radial soft light */}
+      <div style={{
+        position: 'absolute', width: '600px', height: '600px',
