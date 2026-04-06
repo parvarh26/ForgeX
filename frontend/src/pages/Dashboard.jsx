@@ -206,3 +206,11 @@ export default function Dashboard() {
       const response = await fetch('http://localhost:8000/api/v1/github/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ repo }),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Pipeline refused connection (${response.status})`);
+      }
+
