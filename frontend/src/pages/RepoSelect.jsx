@@ -148,3 +148,9 @@ export default function RepoSelect() {
             onFocus={e => { if (!error) e.target.style.borderColor = 'rgba(255,255,255,0.2)'; e.target.style.background = 'rgba(255,255,255,0.05)'; }}
             onBlur={e => { if (!error) e.target.style.borderColor = 'var(--border-subtle)'; e.target.style.background = 'rgba(255,255,255,0.03)'; }}
           />
+        </div>
+
+        {error && (
+          <p style={{ fontSize: '0.8rem', color: 'var(--accent-critical)', marginBottom: '16px', marginTop: '8px' }}>
+            {error}
+          </p>
