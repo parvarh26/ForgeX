@@ -100,3 +100,9 @@ export default function RepoSelect() {
       <div className="surface-card stagger-2" style={{
         width: '100%',
         maxWidth: '520px',
+        padding: '40px',
+        marginBottom: '32px',
+        boxShadow: 'var(--shadow-elevated)',
+      }}>
+
+        <label style={{ 
