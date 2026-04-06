@@ -23,3 +23,8 @@ class SyncRequest(BaseModel):
 
 def _sse_event(payload: dict) -> str:
     """Format a dict as a valid SSE data line."""
+    return f"data: {json.dumps(payload)}\n\n"
+
+
+async def _stream_intelligence(repo: str, db: Session):
+    """
