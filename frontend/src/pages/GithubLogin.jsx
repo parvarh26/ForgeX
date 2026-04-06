@@ -26,3 +26,10 @@ export default function GithubLogin() {
       {/* Background radial soft light */}
       <div style={{
         position: 'absolute', width: '600px', height: '600px',
+        background: 'radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)',
+        zIndex: 0, pointerEvents: 'none'
+      }} />
+
+      <div className="surface-card stagger-1" style={{ 
+        width: '420px', 
+        textAlign: 'center',
