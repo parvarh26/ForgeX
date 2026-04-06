@@ -61,3 +61,6 @@ class LLMService:
         # Real LLM call path (wired in future sprint)
         log.warning("Real LLM endpoint not yet connected — returning keyword-extracted fallback.")
         return f"AI-identified pattern cluster: {keyword_str}."
+
+# Singleton
+llm = LLMService()
