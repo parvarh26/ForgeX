@@ -12,3 +12,10 @@ export default function GithubLogin() {
     }, 2400);
     return () => clearTimeout(timer);
   }, [navigate]);
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
