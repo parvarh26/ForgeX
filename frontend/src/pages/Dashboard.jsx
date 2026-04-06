@@ -110,3 +110,11 @@ function ClusterCard({ cluster, index }) {
       </div>
 
       {/* Issue number pills */}
+      <div style={{
+        borderTop: 'var(--border-subtle)',
+        paddingTop: '20px',
+        display: 'flex', flexWrap: 'wrap', gap: '8px',
+      }}>
+        {cluster.github_issue_numbers?.slice(0, 10).map(num => (
+          <a
+            key={num}
