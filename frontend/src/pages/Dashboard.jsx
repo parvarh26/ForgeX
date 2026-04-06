@@ -86,3 +86,11 @@ function ClusterCard({ cluster, index }) {
               textTransform: 'uppercase',
               color: isCritical ? 'var(--accent-critical)' : 'var(--accent-info)',
             }}>
+              {cluster.urgency} Discovery
+            </span>
+          </div>
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 500, lineHeight: 1.4, color: 'var(--color-text-primary)' }}>
+            {cluster.insight}
+          </h3>
+        </div>
+
