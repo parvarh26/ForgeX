@@ -350,3 +350,11 @@ export default function Dashboard() {
     </div>
   );
 
+  const NAV_ITEMS = [
+    { icon: <Activity size={16} />, label: 'Intelligence' },
+    { icon: <Map size={16} />, label: 'Spatial Matrix' },
+    { icon: <Search size={16} />, label: 'Vector Index' },
+    { icon: <Server size={16} />, label: 'Backend Status' },
+  ];
+
+  const progressPct = progress.total > 0 ? Math.round((progress.processed / progress.total) * 100) : 0;
