@@ -102,3 +102,11 @@ function ClusterCard({ cluster, index }) {
           borderRadius: 'var(--radius-pill)',
           fontSize: '0.75rem',
           fontWeight: 600,
+          color: 'var(--color-text-secondary)',
+          whiteSpace: 'nowrap',
+        }}>
+          {cluster.issue_count} incidents
+        </div>
+      </div>
+
+      {/* Issue number pills */}
