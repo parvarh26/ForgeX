@@ -28,3 +28,9 @@ export default function RepoSelect() {
 
   const handleSync = () => {
     if (!repo.trim()) {
+      setError('Enter a repository in owner/repo format.');
+      return;
+    }
+    if (!repo.includes('/') || repo.split('/').length !== 2) {
+      setError('Format must be owner/repo — e.g. "facebook/react"');
+      return;
