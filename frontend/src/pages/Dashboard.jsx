@@ -22,3 +22,11 @@ async function* readSSEStream(response) {
     for (const line of lines) {
       const trimmed = line.trim();
       if (trimmed.startsWith('data: ')) {
+        const raw = trimmed.slice(6).trim();
+        if (raw) {
+          try { yield JSON.parse(raw); } catch { /* malformed chunk */ }
+        }
+      }
+    }
+  }
+}
