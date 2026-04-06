@@ -158,3 +158,8 @@ async def _stream_intelligence(repo: str, db: Session):
                     "processed": min(chunk_start + CHUNK_SIZE, total),
                     "total": total,
                     "msg": f"Chunk {chunk_start // CHUNK_SIZE + 1} complete. {len(cluster_map) - (1 if -1 in cluster_map else 0)} active clusters."
+                }
+            })
+
+            # Yield control briefly so FastAPI can flush the buffer
+            await asyncio.sleep(0)
