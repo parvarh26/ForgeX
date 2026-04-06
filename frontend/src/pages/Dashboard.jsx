@@ -318,3 +318,11 @@ export default function Dashboard() {
           <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: 'var(--border-subtle)', paddingBottom: '12px' }}>
             <span style={{ color: 'var(--color-text-secondary)' }}>{item.label}</span>
             <span style={{ fontWeight: 600 }}>{item.value}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderSystemStatus = () => (
+    <div className="surface-card stagger-1" style={{ padding: '40px' }}>
