@@ -103,3 +103,8 @@ async def _stream_intelligence(repo: str, db: Session):
 
             # Shift heavy CPU math (PyTorch SIMD) into thread-pool — plan §4.1
             vectors = await run_in_threadpool(embedder.generate_embeddings, batch_texts)
+
+            # Add batch to ephemeral FAISS
+            for i, vec in enumerate(vectors):
+                raw_issue = batch_raw[i]
+                db_row = db_issue_map.get(raw_issue["github_issue_id"])
