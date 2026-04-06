@@ -118,3 +118,13 @@ async def stream_intelligence(repo, issues):
 #### [MODIFY] [Dashboard.jsx](file:///Users/mac/Desktop/CHAINVOTE/frontend/src/pages/Dashboard.jsx)
 Complete rewrite from REST polling to SSE:
 - On mount: read `repo` from `sessionStorage`
+- Open `POST /api/v1/github/sync` then pipe to `ReadableStream` (fetch-based SSE, since GitHub POST requires body)
+- Parse `data: {...}` lines as they arrive
+- `type: "status"` → update status pill
+- `type: "cluster_found"` → append cluster card with staggered mount animation
+- `type: "complete"` → show completion state
+- State: `streaming: bool`, `clusters: []`, `statusMsg: string`
+- Remove `@tanstack/react-query` dependency from this page
+
+---
+
