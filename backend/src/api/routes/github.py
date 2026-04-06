@@ -203,3 +203,8 @@ async def background_crawl(repo: str, db_factory):
                     github_issue_id=raw["github_issue_id"],
                     title=raw["title"],
                     body=raw["body"],
+                    priority_score=0.5,
+                )
+                db.add(db_issue)
+        db.commit()
+        log.info(f"Background crawl complete for {repo}. Cache warmed.")
