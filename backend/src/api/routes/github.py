@@ -173,3 +173,8 @@ async def _stream_intelligence(repo: str, db: Session):
                 "total_issues": total,
                 "total_clusters": final_cluster_count,
                 "repo": repo,
+            }
+        })
+
+    except Exception as e:
+        log.error(f"SSE stream faulted: {e}", exc_info=True)
