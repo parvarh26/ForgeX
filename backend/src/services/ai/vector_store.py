@@ -34,3 +34,12 @@ class VectorStore:
         if self.index.ntotal == 0:
             return []
             
+        try:
+            vec_2d = np.array([vector], dtype=np.float32)
+            distances, indices = self.index.search(vec_2d, top_k)
+            
+            results = []
+            for i, idx in enumerate(indices[0]):
+                if idx != -1: 
+                    score_percentage = float(distances[0][i])
+                    # If same item returns identical score 1.0, we can filter downstream
