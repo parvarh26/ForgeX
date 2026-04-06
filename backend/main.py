@@ -14,3 +14,11 @@ def create_app() -> FastAPI:
     # CORS specifically configured for the Vite Dev Server
     app.add_middleware(
         CORSMiddleware,
+        allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    # Global Exception Handlers (SDE-3 practice)
+    app.add_exception_handler(IntelligenceError, intelligence_exception_handler)
