@@ -43,3 +43,12 @@ class LLMService:
             # Deterministic insight derived from real extracted text
             combined = " ".join(context_texts).lower()
 
+            if any(k in combined for k in ["auth", "login", "oauth", "token", "session"]):
+                return f"Authentication failure cluster detected — recurring pattern in: {keyword_str}."
+            if any(k in combined for k in ["hydration", "ssr", "server-side", "react", "render"]):
+                return f"React rendering alignment issue identified — pattern: {keyword_str}."
+            if any(k in combined for k in ["timeout", "504", "connection", "network", "slow"]):
+                return f"Network latency / timeout cluster surfaced — affecting: {keyword_str}."
+            if any(k in combined for k in ["memory", "leak", "oom", "heap", "crash"]):
+                return f"Memory pressure cluster detected — critical pattern in: {keyword_str}."
+            if any(k in combined for k in ["mobile", "ios", "android", "viewport", "responsive"]):
