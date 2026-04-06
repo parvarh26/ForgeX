@@ -93,3 +93,8 @@ async def _stream_intelligence(repo: str, db: Session):
             db_issue_map[db_issue.github_issue_id] = db_issue
 
         # ── THREAD-POOL CHUNKING (mod 16) ─────────────────────────────────────
+        # Plan §4.1: chunk array modulo 16 to avoid 5+ second event-loop hard-fault
+        CHUNK_SIZE = 16
+        seen_cluster_labels = {}  # track clusters emitted so far
+
+        for chunk_start in range(0, total, CHUNK_SIZE):
