@@ -22,3 +22,8 @@ class IssueResponse(BaseModel):
     similar_issues: List[int]
 
 class ClusterInsightResponse(BaseModel):
+    cluster_id: int
+    issue_count: int
+    insight: str
+    urgency: str
+    issues: List[dict]
