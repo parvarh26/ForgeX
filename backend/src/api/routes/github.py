@@ -58,3 +58,8 @@ async def _stream_intelligence(repo: str, db: Session):
             # Plan updated: Industrial Scale default is 200
             raw_issues = await github_service.fetch_issues(repo, limit=200)
         except ValueError as e:
+            yield _sse_event({"type": "error", "payload": {"msg": str(e)}})
+            return
+
+        if not raw_issues:
+            yield _sse_event({"type": "error", "payload": {"msg": f"No open issues found for '{repo}'."}})
