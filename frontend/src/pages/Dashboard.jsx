@@ -342,3 +342,11 @@ export default function Dashboard() {
             <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>{systemStatus.telemetry.latency_ms}ms</div>
           </div>
           <div className="surface-card" style={{ padding: '20px', background: 'rgba(255,255,255,0.02)' }}>
+            <div style={{ color: 'var(--color-text-muted)', fontSize: '0.7rem', textTransform: 'uppercase', marginBottom: '8px' }}>LLM Health</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--accent-success)' }}>{systemStatus.telemetry.llm_health}</div>
+          </div>
+        </div>
+      ) : <Loader2 className="indicator-pulse" style={{ animation: 'spin 2s linear infinite' }} />}
+    </div>
+  );
+
