@@ -168,3 +168,8 @@ async def _stream_intelligence(repo: str, db: Session):
         final_cluster_count = len([k for k in seen_cluster_labels if k != -1])
         yield _sse_event({
             "type": "complete",
+            "payload": {
+                "msg": f"Intelligence sweep complete. {final_cluster_count} distinct clusters identified in {total} issues.",
+                "total_issues": total,
+                "total_clusters": final_cluster_count,
+                "repo": repo,
