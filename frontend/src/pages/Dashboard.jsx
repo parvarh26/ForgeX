@@ -366,3 +366,11 @@ export default function Dashboard() {
           <div style={{ padding: '8px', background: 'var(--color-surface-elevated)', borderRadius: '12px' }}><Zap size={20} color="var(--color-text-primary)" /></div>
           <span style={{ fontWeight: 700, fontSize: '1.2rem', letterSpacing: '-0.03em' }}>OpenIssue</span>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', border: 'var(--border-subtle)', borderRadius: 'var(--radius-md)', marginBottom: '32px', fontSize: '0.8rem', color: 'var(--color-text-secondary)', overflow: 'hidden' }}>
+          <GitBranch size={14} style={{ flexShrink: 0 }} />
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500 }}>{repo}</span>
+        </div>
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
+          {NAV_ITEMS.map(item => (
+            <div key={item.label} onClick={() => setNavActive(item.label)} className="anim-base" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 14px', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500, color: navActive === item.label ? 'var(--color-text-primary)' : 'var(--color-text-muted)', background: navActive === item.label ? 'rgba(255,255,255,0.05)' : 'transparent' }}>
+              {item.icon} {item.label}
