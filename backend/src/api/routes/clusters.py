@@ -7,3 +7,12 @@ from src.schemas.issue import ClusterInsightResponse
 
 router = APIRouter()
 
+@router.get("/", response_model=list[ClusterInsightResponse])
+async def get_clusters():
+    log.info("Computing live DBSCAN clusters")
+    
+    v_store = issue_router.v_store
+    if not v_store:
+        return []
+        
+    vectors, ids = v_store.get_all_vectors()
