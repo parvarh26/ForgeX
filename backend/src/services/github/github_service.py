@@ -30,3 +30,11 @@ class GitHubService:
 
     async def fetch_issues(self, repo: str, limit: int = 200) -> List[Dict]:
         """
+        Pulls up to `limit` open issues from `owner/repo` using pagination.
+        Filters out pull requests.
+        """
+        if "/" not in repo or len(repo.split("/")) != 2:
+            raise ValueError(f"Invalid repo format: '{repo}'. Expected 'owner/repo'.")
+
+        all_cleaned = []
+        page = 1
