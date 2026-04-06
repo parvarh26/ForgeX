@@ -73,3 +73,8 @@ button {
   opacity: 0.9;
 }
 
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
