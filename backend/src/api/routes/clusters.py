@@ -43,3 +43,4 @@ async def get_clusters():
         ))
         cluster_id_counter += 1
         
+    return results
