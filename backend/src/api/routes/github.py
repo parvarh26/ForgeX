@@ -33,3 +33,8 @@ async def _stream_intelligence(repo: str, db: Session):
     1. Scorched-earth cleanup for the repo tenant
     2. Fetch 200 issues from GitHub via HTTPX (Industrial Scaling)
     3. Initialize ephemeral FAISS space
+    4. Chunk issues mod 16 → run_in_threadpool → FAISS → DBSCAN → yield SSE chunk
+    5. Persist results to SQLite
+    6. Signal completion
+    """
+
