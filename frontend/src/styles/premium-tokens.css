@@ -22,3 +22,7 @@
   --shadow-hover: 0 12px 24px rgba(0,0,0,1), 0 0 0 1px rgba(255,255,255,0.12);
   
   /* Micro Accents */
+  --accent-critical: #FF453A;
+  --accent-success: #32D74B;
+  --accent-info: #0A84FF;
+}
