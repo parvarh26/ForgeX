@@ -88,3 +88,9 @@ export default function RepoSelect() {
       </div>
 
       <div className="stagger-1" style={{ textAlign: 'center', marginBottom: '48px' }}>
+        <h1 style={{ fontSize: '2.5rem', marginBottom: '16px', letterSpacing: '-0.04em', fontWeight: 600 }}>
+          Connect Repository
+        </h1>
+        <p style={{ color: 'var(--color-text-secondary)', fontSize: '1rem', maxWidth: '440px', lineHeight: 1.5 }}>
+          Specify a public GitHub workspace to begin real-time vectorization and recursive clustering.
+        </p>
