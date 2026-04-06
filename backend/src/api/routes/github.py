@@ -128,3 +128,8 @@ async def _stream_intelligence(repo: str, db: Session):
                 github_numbers = []
                 for db_id in group_ids:
                     # Find the DB row by primary key
+                    matching = [r for r in all_db_issues if r.id == db_id]
+                    if matching:
+                        row = matching[0]
+                        context_texts.append(f"{row.title}. {row.body}")
+                        github_numbers.append(row.github_issue_id)
