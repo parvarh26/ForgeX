@@ -78,3 +78,11 @@ export default function Landing() {
         onClick={() => navigate('/login')}
         className="btn-premium stagger-3" 
         style={{ padding: '18px 36px', fontSize: '1.1rem', cursor: 'pointer' }}
+      >
+        Sign in with GitHub <ArrowRight size={20} />
+      </button>
+
+      <div className="stagger-3" style={{ marginTop: '64px', fontSize: '0.8rem', color: 'var(--color-text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+        Built for SDE-3 Scale
+      </div>
+
