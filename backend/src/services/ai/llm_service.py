@@ -16,3 +16,12 @@ _STOP_WORDS = {
 class LLMService:
     def __init__(self):
         self.provider = settings.LLM_PROVIDER
+        log.info(f"Initializing LLM Service with provider: {self.provider}")
+
+    def _extract_keywords(self, texts: list[str], top_n: int = 4) -> list[str]:
+        """Extract top frequency technical keywords from a cluster's real issue text."""
+        combined = " ".join(texts).lower()
+        # Keep only alphanumeric tokens of length >= 3
+        tokens = re.findall(r'\b[a-z][a-z0-9]{2,}\b', combined)
+        filtered = [t for t in tokens if t not in _STOP_WORDS]
+        most_common = Counter(filtered).most_common(top_n)
