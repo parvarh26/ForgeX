@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, event
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.sql import func
 import os
@@ -7,6 +7,15 @@ import os
 engine = create_engine(
     "sqlite:///./openissue.db", connect_args={"check_same_thread": False}
 )
+
+# 🛡️ Hardening: Enable WAL Mode and NORMAL Synchronous for performance & concurrency
+@event.listens_for(engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA journal_mode=WAL")
+    cursor.execute("PRAGMA synchronous=NORMAL")
+    cursor.close()
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
@@ -23,6 +32,9 @@ class IssueModel(Base):
     body = Column(String)
     priority_score = Column(Float, default=0.0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    github_updated_at = Column(String) # Store ISO string from GitHub to use for 'since=' query
+    labels = Column(String, nullable=True) # Comma-separated list of GitHub labels
+    state = Column(String, default="open") # current state of the issue on GitHub
 
 class ClusterModel(Base):
     __tablename__ = "clusters"
@@ -42,13 +54,3 @@ def get_db():
         yield db
     finally:
         db.close()
-
-def scorched_earth_for_repo(db, repo_name: str):
-    """
-    Atomically wipes all Issue and Cluster records for a given repo tenant.
-    Executed before each new sync to prevent spatial matrix contamination — plan.md §5.1.
-    """
-    deleted_issues = db.query(IssueModel).filter(IssueModel.repo_name == repo_name).delete()
-    deleted_clusters = db.query(ClusterModel).filter(ClusterModel.repo_name == repo_name).delete()
-    db.commit()
-    return deleted_issues, deleted_clusters

@@ -4,9 +4,7 @@ from src.core.config import settings
 from src.core.logger import log
 from src.core.exceptions import IntelligenceError, intelligence_exception_handler, global_exception_handler
 from src.api.routes import issues, clusters
-from src.api.routes import github, system
-from src.services.ai.vector_store import VectorStore
-from src.services.ai.embedding_engine import engine as embedder
+from src.api.routes import github, system, ai_search
 
 def create_app() -> FastAPI:
     app = FastAPI(title=settings.PROJECT_NAME)
@@ -27,17 +25,15 @@ def create_app() -> FastAPI:
     # Routes
     app.include_router(issues.router, prefix="/api/v1/issues", tags=["Issues"])
     app.include_router(clusters.router, prefix="/api/v1/clusters", tags=["Clusters"])
-    # SSE streaming GitHub sync — the core of plan.md
     app.include_router(github.router, prefix="/api/v1/github", tags=["GitHub"])
-    # System telemetry for Dashboard status
+    app.include_router(ai_search.router, prefix="/api/v1/ai", tags=["AI Search"])
     app.include_router(system.router, prefix="/api/v1/system", tags=["System"])
 
     @app.on_event("startup")
     async def startup_event():
         log.info("Booting Intelligence Pipeline...")
-        # Dependency Injection of singletons mapped to routers
-        issues.v_store = VectorStore(dimension=embedder.dimension)
-        log.info("Vector Store dynamically linked.")
+        # Systems are now auto-initializing via persistent global stores
+
 
     @app.get("/health")
     def health_check():

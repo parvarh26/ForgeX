@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ShieldAlert, Activity, Map, Search, Server,
-  Zap, Loader2, CheckCircle2, XCircle, GitBranch, ArrowLeft
+  Zap, Loader2, CheckCircle2, XCircle, GitBranch, ArrowLeft,
+  RefreshCw, CheckCircle, Sparkles, MessageSquare, Bot,
+  Code, Folder, FileText
 } from 'lucide-react';
 
 // ── SSE parsing helper ────────────────────────────────────────────────────────
@@ -41,13 +43,12 @@ function StatusPill({ msg, streaming, complete, hasError }) {
     <div style={{
       display: 'inline-flex', alignItems: 'center', gap: '10px',
       padding: '8px 16px',
-      background: 'rgba(255,255,255,0.03)',
+      background: 'var(--color-surface-elevated)',
       border: `1px solid ${hasError ? 'rgba(239,68,68,0.2)' : 'var(--border-subtle)'}`,
       borderRadius: 'var(--radius-pill)',
       fontSize: '0.8rem',
       color: color,
-      maxWidth: '500px',
-      backdropFilter: 'blur(8px)'
+      maxWidth: '500px'
     }}>
       <Icon size={14} style={streaming && !complete && !hasError ? { animation: 'spin 2s linear infinite' } : {}} />
       <span style={{ fontWeight: 500 }}>{msg || (streaming ? 'Pipeline initializing...' : 'Awaiting stream...')}</span>
@@ -56,99 +57,146 @@ function StatusPill({ msg, streaming, complete, hasError }) {
 }
 
 function ClusterCard({ cluster, index }) {
+  const navigate = useNavigate();
   const isCritical = cluster.urgency === 'Critical';
+  
   return (
     <div
-      className="surface-card interactive"
+      onClick={() => navigate(`/cluster/${cluster.cluster_label}`)}
       style={{
-        position: 'relative',
-        overflow: 'hidden',
-        animation: 'fadeUpIn 600ms cubic-bezier(0.16, 1, 0.3, 1) both',
-        animationDelay: `${index * 60}ms`,
-        borderColor: isCritical ? 'rgba(239,68,68,0.2)' : 'var(--border-subtle)',
+        display: 'flex', alignItems: 'flex-start', padding: '16px',
+        borderTop: index === 0 ? 'none' : '1px solid #30363d',
+        background: '#0d1117', cursor: 'pointer',
+        animation: 'fadeUpIn 400ms cubic-bezier(0.16, 1, 0.3, 1) both',
+        animationDelay: `${index * 30}ms`,
       }}
+      onMouseEnter={e => e.currentTarget.style.background = '#161b22'}
+      onMouseLeave={e => e.currentTarget.style.background = '#0d1117'}
     >
-      {/* Critical red accent stripe */}
-      {isCritical && (
-        <div style={{
-          position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px',
-          background: 'var(--accent-critical)',
-          opacity: 0.8
-        }} />
-      )}
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-        <div style={{ flex: 1, paddingLeft: isCritical ? '12px' : 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-            {isCritical && <ShieldAlert size={16} color="var(--accent-critical)" />}
-            <span style={{
-              fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: isCritical ? 'var(--accent-critical)' : 'var(--accent-info)',
-            }}>
-              {cluster.urgency} Discovery
-            </span>
-          </div>
-          <h3 style={{ fontSize: '1.05rem', fontWeight: 500, lineHeight: 1.4, color: 'var(--color-text-primary)' }}>
-            {cluster.insight}
+      <div style={{ marginTop: '2px', flexShrink: 0, color: '#3fb950' }}>
+         <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path><path fillRule="evenodd" d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"></path></svg>
+      </div>
+      <div style={{ marginLeft: '12px', flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '4px' }}>
+          <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#c9d1d9', margin: 0, lineHeight: 1.3 }}>
+            [{cluster.urgency} Discovery]: {cluster.insight}
           </h3>
-        </div>
-
-        <div style={{
-          flexShrink: 0, marginLeft: '16px',
-          background: 'rgba(255,255,255,0.03)',
-          border: 'var(--border-subtle)',
-          padding: '6px 14px',
-          borderRadius: 'var(--radius-pill)',
-          fontSize: '0.75rem',
-          fontWeight: 600,
-          color: 'var(--color-text-secondary)',
-          whiteSpace: 'nowrap',
-        }}>
-          {cluster.issue_count} incidents
-        </div>
-      </div>
-
-      {/* Issue number pills */}
-      <div style={{
-        borderTop: 'var(--border-subtle)',
-        paddingTop: '20px',
-        display: 'flex', flexWrap: 'wrap', gap: '8px',
-      }}>
-        {cluster.github_issue_numbers?.slice(0, 10).map(num => (
-          <a
-            key={num}
-            href={`https://github.com/${cluster.repo}/issues/${num}`}
-            target="_blank"
-            rel="noreferrer"
-            className="anim-base"
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: '4px',
-              padding: '5px 12px',
-              background: 'rgba(255,255,255,0.02)',
-              border: 'var(--border-subtle)',
-              borderRadius: 'var(--radius-sm)',
-              fontSize: '0.75rem',
-              color: 'var(--color-text-secondary)',
-              textDecoration: 'none',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.color = 'var(--color-text-primary)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
-            onMouseLeave={e => { e.currentTarget.style.color = 'var(--color-text-secondary)'; e.currentTarget.style.borderColor = 'var(--border-subtle)'; e.currentTarget.style.background = 'rgba(255,255,255,0.02)'; }}
-          >
-            #{num}
-          </a>
-        ))}
-        {cluster.github_issue_numbers?.length > 10 && (
-          <span style={{ padding: '5px 10px', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-            +{cluster.github_issue_numbers.length - 10} others
+          <span style={{ fontSize: '12px', color: '#8b949e', border: '1px solid rgba(139,148,158,0.3)', padding: '0 10px', borderRadius: '12rem', lineHeight: '20px' }}>
+             Status: Neural Grouping
           </span>
-        )}
+          {isCritical && (
+             <span style={{ fontSize: '12px', color: '#f85149', border: '1px solid rgba(248,81,73,0.3)', padding: '0 10px', borderRadius: '12rem', lineHeight: '20px' }}>
+                Type: High-Risk
+             </span>
+          )}
+        </div>
+        <div style={{ fontSize: '12px', color: '#8b949e' }}>
+          #{cluster.cluster_label} discovered by OpenIssue AI Mapping System
+        </div>
       </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#8b949e', fontSize: '12px', flexShrink: 0, paddingLeft: '16px' }}>
+        <MessageSquare size={14} />
+        {cluster.issue_count}
+      </div>
+    </div>
+  );
+}
 
-      {/* Progress annotation */}
-      {cluster.progress && (
-        <div style={{ marginTop: '16px', fontSize: '0.7rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Activity size={12} /> {cluster.progress}
+// ── Global Context Search (GitHub Command Palette) ──────────────────────────────
+
+function GlobalCommandPalette({ repo, clusters }) {
+  const [query, setQuery] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
+  const navigate = useNavigate();
+  const inputRef = useRef(null);
+
+  // Global "/" shortcut listener
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Don't focus if we're already typing in an input/textarea
+      if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Suggest up to 5 clusters matching the substring
+  const suggestions = query.trim() 
+    ? clusters.filter(c => c.insight.toLowerCase().includes(query.toLowerCase())).slice(0, 5)
+    : [];
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (!query.trim()) return;
+    setIsFocused(false);
+    navigate(`/search?repo=${encodeURIComponent(repo)}&q=${encodeURIComponent(query)}`);
+  };
+
+  return (
+    <div style={{ position: 'relative', width: '400px' }}>
+      <form onSubmit={handleSearchSubmit} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+        <input 
+          ref={inputRef}
+          type="text" 
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+          placeholder={`Type / to search ${repo}`} 
+          style={{
+            width: '100%', padding: '6px 12px 6px 32px',
+            fontSize: '14px', lineHeight: '20px',
+            background: 'rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px',
+            color: '#c9d1d9', outline: 'none',
+            transition: 'width 0.2s, background 0.2s',
+          }}
+          onFocusCapture={e => { e.target.style.background = '#0d1117'; e.target.style.borderColor = '#58a6ff'; e.target.style.width = '600px'; }}
+          onBlurCapture={e => { e.target.style.background = 'rgba(255,255,255,0.1)'; e.target.style.borderColor = 'rgba(255,255,255,0.2)'; e.target.style.width = '100%'; }}
+        />
+        <Search size={14} color="#8b949e" style={{ position: 'absolute', left: '10px' }} />
+        <div style={{ position: 'absolute', right: '10px', fontSize: '10px', padding: '2px 6px', border: '1px solid #30363d', borderRadius: '4px', color: '#8b949e' }}>/</div>
+      </form>
+
+      {/* Suggestion Dropdown Panel */}
+      {isFocused && query.trim() && (
+        <div style={{ 
+          position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '8px', 
+          background: '#161b22', border: '1px solid #30363d', borderRadius: '6px', 
+          boxShadow: '0 8px 24px rgba(0,0,0,0.5)', zIndex: 100, overflow: 'hidden'
+        }}>
+          {suggestions.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ padding: '8px 12px', fontSize: '12px', color: '#8b949e', borderBottom: '1px solid #30363d' }}>
+                Jump to cluster...
+              </div>
+              {suggestions.map(s => (
+                <div 
+                  key={s.cluster_label}
+                  onClick={() => navigate(`/cluster/${s.cluster_label}`)}
+                  style={{ padding: '12px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#c9d1d9', fontSize: '13px', borderBottom: '1px solid #30363d' }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#21262d'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                >
+                  <MessageSquare size={14} color="#8b949e"/>
+                  <span style={{ fontWeight: 600 }}>{s.insight}</span> 
+                  <span style={{ color: '#8b949e', fontSize: '12px', marginLeft: 'auto' }}>#{s.cluster_label}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#c9d1d9', fontSize: '13px' }}
+                onClick={handleSearchSubmit}
+                onMouseEnter={e => e.currentTarget.style.background = '#21262d'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              <Bot size={16} color="#58a6ff"/> 
+              <span>Ask OpenIssue AI to solve: <strong>{query}</strong></span>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -165,7 +213,8 @@ export default function Dashboard() {
   const [complete, setComplete]     = useState(false);
   const [hasError, setHasError]     = useState(false);
   const [progress, setProgress]     = useState({ processed: 0, total: 0 });
-  const [navActive, setNavActive]   = useState('Intelligence');
+  const [bgSync, setBgSync]         = useState({ processed: 0, total_repo: 0, is_syncing: false, just_finished: false });
+  const [navActive, setNavActive]   = useState('Code');
   const [systemStatus, setSystemStatus] = useState(null);
   const abortRef = useRef(null);
 
@@ -175,6 +224,30 @@ export default function Dashboard() {
     startStream();
     return () => abortRef.current?.abort();
   }, [repo]);
+
+  // Background Sync Bar Polling
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetch(`http://localhost:8000/api/v1/github/sync/progress?repo=${encodeURIComponent(repo)}`)
+        .then(res => res.json())
+        .then(data => {
+            setBgSync(prev => {
+                const justFinished = (prev.is_syncing && !data.is_syncing && data.processed > 0);
+                return { ...data, just_finished: justFinished || prev.just_finished };
+            });
+            if (data.total_repo > 0) {
+              setProgress(p => ({ ...p, total: data.total_repo }));
+            }
+        })
+        .catch(() => {});
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [repo]);
+
+  // Synchronize Live AI Clusters to Session Storage for Details Route
+  useEffect(() => {
+    sessionStorage.setItem('openissue_clusters', JSON.stringify(clusters));
+  }, [clusters]);
 
   // Telemetry polling for System Status tab
   useEffect(() => {
@@ -224,7 +297,7 @@ export default function Dashboard() {
         }
         if (type === 'cluster_found') {
           setClusters(prev => {
-            const existing = prev.findIndex(c => c.cluster_label === payload.cluster_label);
+            const existing = prev.findIndex(c => String(c.cluster_label) === String(payload.cluster_label));
             if (existing >= 0) {
               const next = [...prev];
               next[existing] = { ...payload, repo };
@@ -255,13 +328,38 @@ export default function Dashboard() {
 
   const renderIntelligence = () => (
     <>
+      {/* Background Sync Bar */}
+      {(bgSync.is_syncing || bgSync.just_finished) && (
+        <div className="surface-card" style={{ padding: '16px 24px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: bgSync.just_finished ? '1px solid #238636' : '1px solid #30363d' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                {bgSync.is_syncing ? <Loader2 className="indicator-pulse" style={{ animation: 'spin 2s linear infinite', color: '#8b949e' }} size={18} /> : <CheckCircle size={18} style={{ color: '#238636' }}/>}
+                <div>
+                   <div style={{ fontSize: '14px', fontWeight: 600, color: '#c9d1d9' }}>
+                     {bgSync.is_syncing ? 'Background Data Sync Active' : 'Repository Sync Complete'}
+                   </div>
+                   <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '2px' }}>
+                     {bgSync.processed} / {bgSync.total_repo || '?'} issues securely indexed in SQLite
+                   </div>
+                </div>
+            </div>
+            {bgSync.just_finished && (
+                <button 
+                  onClick={() => { setBgSync(p => ({...p, just_finished: false})); startStream(); }}
+                  style={{ background: 'var(--accent-success)', color: '#000', border: 'none', padding: '8px 16px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <RefreshCw size={14} /> Recompute AI Matrix
+                </button>
+            )}
+        </div>
+      )}
+
       {/* Stats row */}
       {(clusters.length > 0 || complete) && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '40px' }}>
           {[
             { label: 'Neural Clusters', value: clusters.length, color: 'var(--accent-info)' },
             { label: 'Critical Mass', value: clusters.filter(c => c.urgency === 'Critical').length, color: 'var(--accent-critical)' },
-            { label: 'Issues Ingested', value: progress.total || '—', color: 'var(--color-text-primary)' },
+            { label: 'Issues Ingested', value: bgSync.processed || progress.total || '—', color: 'var(--color-text-primary)' },
           ].map(stat => (
             <div key={stat.label} className="surface-card" style={{ padding: '24px', textAlign: 'center' }}>
               <div style={{ fontSize: '2.2rem', fontWeight: 700, marginBottom: '6px', letterSpacing: '-0.04em', color: stat.color }}>{stat.value}</div>
@@ -273,8 +371,14 @@ export default function Dashboard() {
 
       {/* Cluster Feed */}
       {clusters.length > 0 ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          {clusters.map((cluster, idx) => <ClusterCard key={cluster.cluster_label} cluster={cluster} index={idx} />)}
+        <div style={{ border: '1px solid #30363d', borderRadius: '6px', background: '#0d1117', overflow: 'hidden' }}>
+          <div style={{ padding: '16px', background: '#161b22', borderBottom: '1px solid #30363d', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 600, color: '#c9d1d9' }}>
+            <svg viewBox="0 0 16 16" width="16" height="16" fill="#c9d1d9"><path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path><path fillRule="evenodd" d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"></path></svg>
+            <span>Open <span style={{ color: '#8b949e', fontWeight: 400 }}>{clusters.length}</span></span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {clusters.map((cluster, idx) => <ClusterCard key={cluster.cluster_label} cluster={cluster} index={idx} />)}
+          </div>
         </div>
       ) : streaming && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', padding: '100px 0', color: 'var(--color-text-muted)' }}>
@@ -324,6 +428,132 @@ export default function Dashboard() {
     </div>
   );
 
+// ── Repository Browser component (The "Code" Tab) ───────────────────────────
+
+function RepositoryBrowser({ repo }) {
+  const [path, setPath] = useState('');
+  const [contents, setContents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchContents(path);
+  }, [repo, path]);
+
+  const fetchContents = async (currentPath) => {
+    setLoading(true);
+    setError('');
+    try {
+      const resp = await fetch(`https://api.github.com/repos/${repo}/contents/${currentPath}`);
+      if (!resp.ok) throw new Error('Repository is currently unreachable or private.');
+      const data = await resp.ok ? await resp.json() : [];
+      // Sort: folders first, then files
+      const sorted = Array.isArray(data) ? data.sort((a, b) => {
+        if (a.type === b.type) return a.name.localeCompare(b.name);
+        return a.type === 'dir' ? -1 : 1;
+      }) : [];
+      setContents(sorted);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFolderClick = (dirPath) => setPath(dirPath);
+  const handleBreadcrumbClick = (crumbPath) => setPath(crumbPath);
+
+  const breadcrumbs = path.split('/').filter(Boolean);
+
+  return (
+    <div style={{ animation: 'fadeUpIn 400ms ease both' }}>
+      {/* File Explorer Header (GitHub Style) */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', fontSize: '14px' }}>
+        <div 
+          onClick={() => setPath('')}
+          style={{ color: '#58a6ff', cursor: 'pointer', fontWeight: 600 }}
+          onMouseEnter={e => e.target.style.textDecoration = 'underline'}
+          onMouseLeave={e => e.target.style.textDecoration = 'none'}
+        >
+          {repo.split('/')[1]}
+        </div>
+        {breadcrumbs.map((crumb, idx) => (
+          <React.Fragment key={idx}>
+            <span style={{ color: '#8b949e' }}>/</span>
+            <div 
+              onClick={() => handleBreadcrumbClick(breadcrumbs.slice(0, idx + 1).join('/'))}
+              style={{ color: '#58a6ff', cursor: 'pointer', fontWeight: 600 }}
+              onMouseEnter={e => e.target.style.textDecoration = 'underline'}
+              onMouseLeave={e => e.target.style.textDecoration = 'none'}
+            >
+              {crumb}
+            </div>
+          </React.Fragment>
+        ))}
+      </div>
+
+      <div style={{ border: '1px solid #30363d', borderRadius: '6px', background: '#0d1117', overflow: 'hidden' }}>
+        {/* Table Head */}
+        <div style={{ padding: '12px 16px', background: '#161b22', borderBottom: '1px solid #30363d', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#c9d1d9', fontSize: '14px' }}>
+             <GitBranch size={16} color="#8b949e" />
+             <span style={{ fontWeight: 600 }}>main</span>
+             <span style={{ color: '#8b949e', fontWeight: 400 }}>{contents.length} nodes</span>
+          </div>
+        </div>
+
+        {/* Directory List */}
+        {loading ? (
+          <div style={{ padding: '40px', display: 'flex', justifyContent: 'center' }}>
+            <Loader2 className="indicator-pulse" style={{ animation: 'spin 2s linear infinite', color: '#8b949e' }} />
+          </div>
+        ) : error ? (
+          <div style={{ padding: '40px', color: '#f85149', textAlign: 'center', fontSize: '14px' }}>{error}</div>
+        ) : (
+          <div>
+            {path && (
+               <div 
+                 onClick={() => setPath(path.includes('/') ? path.split('/').slice(0, -1).join('/') : '')}
+                 style={{ padding: '12px 16px', borderBottom: '1px solid #30363d', color: '#58a6ff', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}
+                 onMouseEnter={e => e.currentTarget.style.background = '#161b22'}
+                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+               >
+                 <span style={{ fontWeight: 600, fontSize: '18px', width: '16px', textAlign: 'center' }}>..</span>
+                 <span>Go to parent directory</span>
+               </div>
+            )}
+            {contents.map((item, idx) => (
+               <div 
+                 key={item.sha}
+                 onClick={() => item.type === 'dir' && handleFolderClick(item.path)}
+                 style={{ 
+                   padding: '12px 16px', 
+                   borderBottom: idx === contents.length - 1 ? 'none' : '1px solid #30363d', 
+                   display: 'grid', gridTemplateColumns: 'minmax(200px, 1fr) 2fr 1fr', 
+                   alignItems: 'center', fontSize: '14px', cursor: item.type === 'dir' ? 'pointer' : 'default' 
+                 }}
+                 onMouseEnter={e => e.currentTarget.style.background = '#161b22'}
+                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+               >
+                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {item.type === 'dir' ? <Folder size={16} color="#7d8590" /> : <FileText size={16} color="#7d8590" />}
+                    <span style={{ color: item.type === 'dir' ? '#c9d1d9' : '#c9d1d9', hover: { color: '#58a6ff' } }}>{item.name}</span>
+                 </div>
+                 <div style={{ color: '#8b949e', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    Integrated via OpenIssue Semantic Sync
+                 </div>
+                 <div style={{ color: '#8b949e', fontSize: '13px', textAlign: 'right' }}>
+                    just now
+                 </div>
+               </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
   const renderSystemStatus = () => (
     <div className="surface-card stagger-1" style={{ padding: '40px' }}>
       <h2 style={{ marginBottom: '32px' }}>System Telemetry</h2>
@@ -351,6 +581,7 @@ export default function Dashboard() {
   );
 
   const NAV_ITEMS = [
+    { icon: <Code size={16} />, label: 'Code' },
     { icon: <Activity size={16} />, label: 'Intelligence' },
     { icon: <Map size={16} />, label: 'Spatial Matrix' },
     { icon: <Search size={16} />, label: 'Vector Index' },
@@ -360,37 +591,61 @@ export default function Dashboard() {
   const progressPct = progress.total > 0 ? Math.round((progress.processed / progress.total) * 100) : 0;
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', minHeight: '100vh', background: 'var(--color-base)' }}>
-      <aside style={{ borderRight: 'var(--border-subtle)', padding: '32px 24px', display: 'flex', flexDirection: 'column', background: 'rgba(5,5,5,0.4)', backdropFilter: 'blur(20px)', position: 'sticky', top: 0, height: '100vh' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '40px' }}>
-          <div style={{ padding: '8px', background: 'var(--color-surface-elevated)', borderRadius: '12px' }}><Zap size={20} color="var(--color-text-primary)" /></div>
-          <span style={{ fontWeight: 700, fontSize: '1.2rem', letterSpacing: '-0.03em' }}>OpenIssue</span>
+    <div style={{ minHeight: '100vh', background: '#0d1117' }}>
+      
+      {/* GitHub Global Top Nav */}
+      <div style={{ background: '#010409', padding: '16px 24px', borderBottom: '1px solid #30363d', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', background: '#161b22', border: '1px solid #30363d', borderRadius: '50%' }}>
+            <Zap size={16} color="#c9d1d9" />
+          </div>
+          <div style={{ fontSize: '14px', fontWeight: 600, color: '#c9d1d9', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ color: '#8b949e', fontWeight: 400 }}>OpenIssue</span>
+            <span style={{ color: '#8b949e' }}>/</span>
+            <span style={{ fontWeight: 600 }}>{repo}</span>
+            <span style={{ padding: '2px 8px', border: '1px solid #30363d', borderRadius: '2rem', fontSize: '12px', color: '#8b949e', marginLeft: '8px' }}>Public</span>
+          </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', border: 'var(--border-subtle)', borderRadius: 'var(--radius-md)', marginBottom: '32px', fontSize: '0.8rem', color: 'var(--color-text-secondary)', overflow: 'hidden' }}>
-          <GitBranch size={14} style={{ flexShrink: 0 }} />
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500 }}>{repo}</span>
+        
+        {/* Subcutaneous search insertion point */}
+        <GlobalCommandPalette repo={repo} clusters={clusters} />
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <StatusPill msg={statusMsg} streaming={streaming} complete={complete} hasError={hasError} />
+          <button onClick={() => navigate('/select-repo')} style={{ background: '#21262d', border: '1px solid #30363d', color: '#c9d1d9', padding: '5px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <ArrowLeft size={14} /> New Sync
+          </button>
         </div>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
+      </div>
+
+      {/* GitHub Horizontal Tab Navigation */}
+      <div style={{ background: '#010409', borderBottom: '1px solid #30363d', padding: '0 24px' }}>
+        <nav style={{ display: 'flex', gap: '16px', maxWidth: '1216px', margin: '0 auto' }}>
           {NAV_ITEMS.map(item => (
-            <div key={item.label} onClick={() => setNavActive(item.label)} className="anim-base" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 14px', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500, color: navActive === item.label ? 'var(--color-text-primary)' : 'var(--color-text-muted)', background: navActive === item.label ? 'rgba(255,255,255,0.05)' : 'transparent' }}>
-              {item.icon} {item.label}
+            <div 
+              key={item.label} 
+              onClick={() => setNavActive(item.label)} 
+              style={{ 
+                 display: 'flex', alignItems: 'center', gap: '8px', 
+                 padding: '12px 8px', cursor: 'pointer', fontSize: '14px', 
+                 color: navActive === item.label ? '#c9d1d9' : '#8b949e',
+                 borderBottom: navActive === item.label ? '2px solid #fd8c73' : '2px solid transparent',
+                 fontWeight: navActive === item.label ? 600 : 400,
+                 transition: 'border-color 0.2s',
+              }}
+            >
+              {React.cloneElement(item.icon, { color: navActive === item.label ? '#c9d1d9' : '#8b949e' })} {item.label}
             </div>
           ))}
         </nav>
-        <div onClick={() => navigate('/select-repo')} className="anim-base" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: 'auto', borderTop: 'var(--border-subtle)', paddingTop: '24px' }}>
-          <ArrowLeft size={14} /> New Sync Pipeline
-        </div>
-      </aside>
+      </div>
 
-      <main style={{ padding: '48px 60px', maxWidth: '1200px', width: '100%', position: 'relative' }}>
-        <div style={{ position: 'fixed', top: '10%', right: '10%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(59,130,246,0.03) 0%, transparent 70%)', pointerEvents: 'none' }} />
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px', position: 'relative', zIndex: 1 }}>
-          <div>
-            <h1 style={{ fontSize: '2rem', marginBottom: '8px', letterSpacing: '-0.04em', fontWeight: 600 }}>{navActive}</h1>
-            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem', letterSpacing: '0.01em' }}>{repo} · Live Intelligence Stream</p>
-          </div>
-          <StatusPill msg={statusMsg} streaming={streaming} complete={complete} hasError={hasError} />
-        </header>
+      {/* Center Container Content */}
+      <main style={{ padding: '40px 24px', maxWidth: '1216px', margin: '0 auto', width: '100%', position: 'relative' }}>
+        
+        {/* We removed the redundant header since it's above now */}
+
+        {/* AISearchBar removed in favor of Top Nav Palette */}
 
         {streaming && progress.total > 0 && (
           <div className="stagger-1" style={{ marginBottom: '40px' }}>
@@ -398,32 +653,33 @@ export default function Dashboard() {
               <span>Vectorizing incidents</span>
               <span>{progress.processed} / {progress.total} Mapped</span>
             </div>
-            <div style={{ height: '4px', background: 'rgba(255,255,255,0.03)', border: 'var(--border-subtle)', borderRadius: 'var(--radius-pill)', overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${progressPct}%`, background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)', borderRadius: 'var(--radius-pill)', transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} />
+            <div style={{ height: '4px', background: '#161b22', border: 'var(--border-subtle)', borderRadius: 'var(--radius-pill)', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${progressPct}%`, background: '#238636', borderRadius: 'var(--radius-pill)', transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} />
             </div>
           </div>
         )}
 
+        {navActive === 'Code' && <RepositoryBrowser repo={repo} />}
         {navActive === 'Intelligence' && renderIntelligence()}
         {navActive === 'Spatial Matrix' && renderSpatialMatrix()}
         {navActive === 'Vector Index' && renderVectorIndex()}
         {navActive === 'Backend Status' && renderSystemStatus()}
 
         {complete && navActive === 'Intelligence' && (
-          <div className="stagger-3" style={{ marginTop: '48px', padding: '24px', background: 'rgba(50,215,75,0.03)', border: '1px solid rgba(50,215,75,0.1)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="stagger-3" style={{ marginTop: '48px', padding: '24px', background: '#0d1117', border: '1px solid #238636', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <CheckCircle2 size={20} color="var(--accent-success)" />
-              <span style={{ fontSize: '0.95rem', color: 'var(--color-text-secondary)', fontWeight: 500 }}>Intelligence sweep finished.</span>
+              <CheckCircle2 size={20} color="#238636" />
+              <span style={{ fontSize: '14px', color: '#c9d1d9', fontWeight: 600 }}>Intelligence sweep finished.</span>
             </div>
-            <button className="btn-outline" onClick={startStream} style={{ padding: '10px 24px', fontSize: '0.85rem' }}>Restart Pipeline</button>
+            <button className="btn-outline" onClick={startStream} style={{ padding: '5px 16px', fontSize: '12px' }}>Restart Pipeline</button>
           </div>
         )}
 
         {hasError && (
-          <div className="stagger-1" style={{ marginTop: '24px', padding: '28px', background: 'rgba(255,69,58,0.03)', border: '1px solid rgba(255,69,58,0.15)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}><XCircle size={20} color="var(--accent-critical)" /><p style={{ color: 'var(--accent-critical)', fontSize: '1rem', fontWeight: 600 }}>Pipeline Fault Detected</p></div>
-            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', lineHeight: 1.5 }}>{statusMsg}</p>
-            <button className="btn-premium" onClick={startStream} style={{ marginTop: '24px', padding: '12px 24px', fontSize: '0.9rem', background: 'var(--accent-critical)', color: 'white' }}>Retry Handshake</button>
+          <div className="stagger-1" style={{ marginTop: '24px', padding: '28px', background: '#0d1117', border: '1px solid #f85149', borderRadius: 'var(--radius-md)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}><XCircle size={20} color="#f85149" /><p style={{ color: '#f85149', fontSize: '14px', fontWeight: 600 }}>Pipeline Fault Detected</p></div>
+            <p style={{ color: '#8b949e', fontSize: '13px', lineHeight: 1.5 }}>{statusMsg}</p>
+            <button className="btn-premium" onClick={startStream} style={{ marginTop: '24px', background: '#f85149', color: 'white', border: 'none' }}>Retry Handshake</button>
           </div>
         )}
       </main>

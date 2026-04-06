@@ -1,28 +1,28 @@
 :root {
-  /* The Void */
-  --color-base: #000000;
-  --color-surface: #0a0a0a;
-  --color-surface-hover: #141414;
-  --color-surface-elevated: #1a1a1a;
+  /* GitHub Dark Void */
+  --color-base: #010409;
+  --color-surface: #0d1117;
+  --color-surface-hover: #161b22;
+  --color-surface-elevated: #21262d;
   
   /* Text */
-  --color-text-primary: #ededed;
-  --color-text-secondary: #888888;
-  --color-text-muted: #555555;
+  --color-text-primary: #c9d1d9;
+  --color-text-secondary: #8b949e;
+  --color-text-muted: #6e7681;
   
   /* Structure */
-  --border-subtle: 1px solid rgba(255, 255, 255, 0.08);
-  --border-focus: 1px solid rgba(255, 255, 255, 0.2);
+  --border-subtle: 1px solid #30363d;
+  --border-focus: 1px solid #58a6ff;
   --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-pill: 99px;
+  --radius-md: 6px;
+  --radius-pill: 2rem;
   
-  /* Shadows that feel physical */
-  --shadow-elevated: 0 4px 12px rgba(0,0,0,1), 0 0 0 1px rgba(255,255,255,0.06);
-  --shadow-hover: 0 12px 24px rgba(0,0,0,1), 0 0 0 1px rgba(255,255,255,0.12);
+  /* Shadows */
+  --shadow-elevated: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-hover: 0 8px 16px rgba(0,0,0,0.6);
   
   /* Micro Accents */
-  --accent-critical: #FF453A;
-  --accent-success: #32D74B;
-  --accent-info: #0A84FF;
+  --accent-critical: #f85149;
+  --accent-success: #238636;
+  --accent-info: #58a6ff;
 }

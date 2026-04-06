@@ -26,7 +26,7 @@ export default function RepoSelect() {
     }
   };
 
-  const handleSync = () => {
+  const handleSync = async () => {
     if (!repo.trim()) {
       setError('Enter a repository in owner/repo format.');
       return;
@@ -35,11 +35,26 @@ export default function RepoSelect() {
       setError('Format must be owner/repo — e.g. "facebook/react"');
       return;
     }
+    
     setError('');
     setSyncing(true);
-    // Persist repo slug for Dashboard to consume
-    sessionStorage.setItem('openissue_repo', repo.trim());
-    setTimeout(() => navigate('/dashboard'), 600);
+
+    try {
+      // plan.md §3.4 — Robust Failsafe: Verify repo existence via Backend Proxy
+      const response = await fetch(`http://localhost:8000/api/v1/github/verify?repo=${encodeURIComponent(repo.trim())}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Repository not found or private.');
+      }
+      
+      // Persist repo slug for Dashboard to consume
+      sessionStorage.setItem('openissue_repo', repo.trim());
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSyncing(false);
+    }
   };
 
   const handleKeyDown = (e) => {
