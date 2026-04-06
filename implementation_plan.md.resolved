@@ -98,3 +98,13 @@ async def stream_intelligence(repo, issues):
 #### [MODIFY] [llm_service.py](file:///Users/mac/Desktop/CHAINVOTE/backend/src/services/ai/llm_service.py)
 - `generate_cluster_insight()` now takes real issue titles/bodies
 - Smarter keyword extraction from actual text (not hardcoded mock)
+
+#### [MODIFY] [main.py](file:///Users/mac/Desktop/CHAINVOTE/backend/main.py)
+- `include_router(github.router, prefix="/api/v1/github", tags=["GitHub"])`
+
+---
+
+### Frontend — Repo Input (Real)
+
+#### [MODIFY] [RepoSelect.jsx](file:///Users/mac/Desktop/CHAINVOTE/frontend/src/pages/RepoSelect.jsx)
+- Replace mock repo list with a free-text `<input>` for `owner/repo`
