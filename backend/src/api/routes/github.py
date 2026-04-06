@@ -113,3 +113,8 @@ async def _stream_intelligence(repo: str, db: Session):
 
             # ── DBSCAN after each chunk ──────────────────────────────────────
             all_vecs, all_ids = v_store.get_all_vectors()
+            if len(all_vecs) < 2:
+                continue
+
+            cluster_map = clusterer.compute_clusters(all_vecs, all_ids)
+
