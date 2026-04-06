@@ -34,3 +34,9 @@ export default function RepoSelect() {
     if (!repo.includes('/') || repo.split('/').length !== 2) {
       setError('Format must be owner/repo — e.g. "facebook/react"');
       return;
+    }
+    setError('');
+    setSyncing(true);
+    // Persist repo slug for Dashboard to consume
+    sessionStorage.setItem('openissue_repo', repo.trim());
+    setTimeout(() => navigate('/dashboard'), 600);
