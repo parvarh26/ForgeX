@@ -154,3 +154,9 @@ export default function RepoSelect() {
           <p style={{ fontSize: '0.8rem', color: 'var(--accent-critical)', marginBottom: '16px', marginTop: '8px' }}>
             {error}
           </p>
+        )}
+
+        <button
+          id="sync-btn"
+          className="btn-premium"
+          onClick={handleSync}
