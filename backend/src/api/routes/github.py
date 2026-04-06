@@ -228,3 +228,8 @@ async def sync_repository(request: SyncRequest, background_tasks: BackgroundTask
     background_tasks.add_task(background_crawl, request.repo, SessionLocal)
 
     return StreamingResponse(
+        _stream_intelligence(request.repo, db),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
