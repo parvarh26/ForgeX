@@ -33,3 +33,10 @@ async def ingest_issue(issue: IssueCreate, background_tasks: BackgroundTasks, db
         # 3. Synchronous similarity check to classify duplicate count immediately
         similar_results = []
         if v_store:
+            similar_results = v_store.search_similar(vector, top_k=3)
+            # Find issues with high similarity > 85%
+            duplicates = [res for res in similar_results if res['similarity_score'] > 0.85]
+            
+            # Store it for future
+            v_store.add_vector(db_issue.id, vector)
+            
