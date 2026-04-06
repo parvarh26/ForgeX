@@ -10,3 +10,9 @@ const SUGGESTED_REPOS = [
   'django/django',
 ];
 
+export default function RepoSelect() {
+  const navigate = useNavigate();
+  const [repo, setRepo] = useState('');
+  const [syncing, setSyncing] = useState(false);
+  const [error, setError] = useState('');
+  const warmRef = useRef(false);
