@@ -26,3 +26,7 @@ async def get_system_status():
             "latency_ms": 12, # mock latency
             "llm_provider": settings.LLM_PROVIDER,
             "llm_health": llm_health,
+            "environment": settings.ENVIRONMENT
+        },
+        "timestamp": time.time()
+    }
