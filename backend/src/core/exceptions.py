@@ -16,3 +16,8 @@ async def intelligence_exception_handler(request: Request, exc: IntelligenceErro
     )
 
 async def global_exception_handler(request: Request, exc: Exception):
+    log.critical(f"Unhandled system fault: {str(exc)} on path {request.url.path}", exc_info=True)
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"error": {"code": 500, "message": "An unexpected system fault occurred."}}
+    )
