@@ -54,3 +54,11 @@ export default function Landing() {
         textAlign: 'center',
         lineHeight: '1',
         maxWidth: '900px',
+        marginBottom: '24px',
+        color: 'var(--color-text-primary)'
+      }}>
+        Predictive routing <br/>
+        <span style={{ color: 'var(--color-text-muted)' }}>for modern maintainers.</span>
+      </h1>
+
+      <p className="stagger-3" style={{
