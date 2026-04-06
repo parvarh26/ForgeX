@@ -78,3 +78,11 @@ class GitHubService:
                 
                 page += 1
                 # Small safety delay to avoid hitting primary rate limits too fast
+                await asyncio.sleep(0.1)
+
+        log.info(f"Industrial fetch complete: {len(all_cleaned)} issues indexed from {repo}.")
+        return all_cleaned
+
+
+# Module-level singleton
+github_service = GitHubService()
