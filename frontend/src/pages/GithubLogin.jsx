@@ -33,3 +33,10 @@ export default function GithubLogin() {
       <div className="surface-card stagger-1" style={{ 
         width: '420px', 
         textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '56px 40px',
+        zIndex: 1,
+        boxShadow: 'var(--shadow-hover)'
+      }}>
