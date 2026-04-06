@@ -190,3 +190,9 @@ export default function RepoSelect() {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
           {SUGGESTED_REPOS.map(r => (
             <button
+              key={r}
+              onClick={() => { setRepo(r); setError(''); warmRef.current = false; }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
