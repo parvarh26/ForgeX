@@ -12,3 +12,10 @@ router = APIRouter()
 
 # Global reference that will be set in main.py
 v_store = None
+
+@router.post("/", response_model=IssueResponse)
+async def ingest_issue(issue: IssueCreate, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    global v_store
+    
+    log.info(f"Ingesting new issue: {issue.title}")
+    
