@@ -19,3 +19,10 @@ class Settings(BaseSettings):
     LLM_PROVIDER: str = "mock" # options: "mock", "groq"
 
     # GitHub API Config — set GITHUB_TOKEN in .env for higher rate limits
+    GITHUB_TOKEN: Optional[str] = None
+
+    class Config:
+        env_file = ".env"
+        case_sensitive = True
+
+settings = Settings()
