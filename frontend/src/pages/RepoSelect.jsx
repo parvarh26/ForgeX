@@ -184,3 +184,9 @@ export default function RepoSelect() {
 
       {/* Suggested repos */}
       <div className="stagger-3" style={{ width: '100%', maxWidth: '520px' }}>
+        <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '16px', textAlign: 'center', letterSpacing: '0.02em' }}>
+          Explore Verified Workspaces
+        </p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
+          {SUGGESTED_REPOS.map(r => (
+            <button
