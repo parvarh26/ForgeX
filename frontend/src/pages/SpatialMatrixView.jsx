@@ -54,8 +54,10 @@ function SpatialMatrixView({ repo }) {
 
     const xs = data.points.map(p => p.x);
     const ys = data.points.map(p => p.y);
-    const minX = Math.min(...xs), maxX = Math.max(...xs);
-    const minY = Math.min(...ys), maxY = Math.max(...ys);
+    const minX = xs.reduce((a, b) => Math.min(a, b), Infinity);
+    const maxX = xs.reduce((a, b) => Math.max(a, b), -Infinity);
+    const minY = ys.reduce((a, b) => Math.min(a, b), Infinity);
+    const maxY = ys.reduce((a, b) => Math.max(a, b), -Infinity);
     const rangeX = maxX - minX || 1, rangeY = maxY - minY || 1;
     const pad = 60;
 
@@ -130,8 +132,10 @@ function SpatialMatrixView({ repo }) {
     const my = e.clientY - rect.top;
     const W = canvasRef.current.width, H = canvasRef.current.height;
     const xs = data.points.map(p => p.x), ys = data.points.map(p => p.y);
-    const minX = Math.min(...xs), maxX = Math.max(...xs);
-    const minY = Math.min(...ys), maxY = Math.max(...ys);
+    const minX = xs.reduce((a, b) => Math.min(a, b), Infinity);
+    const maxX = xs.reduce((a, b) => Math.max(a, b), -Infinity);
+    const minY = ys.reduce((a, b) => Math.min(a, b), Infinity);
+    const maxY = ys.reduce((a, b) => Math.max(a, b), -Infinity);
     const rangeX = maxX - minX || 1, rangeY = maxY - minY || 1;
     const pad = 60;
 

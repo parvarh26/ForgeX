@@ -14,6 +14,7 @@ export default function App() {
       <Route path="/login" element={<GithubLogin />} />
       <Route path="/select-repo" element={<RepoSelect />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/dashboard/:owner/:repoName" element={<Dashboard />} />
       <Route path="/cluster/:id" element={<ClusterDetail />} />
       <Route path="/search" element={<SearchResults />} />
     </Routes>

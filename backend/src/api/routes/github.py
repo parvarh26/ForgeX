@@ -121,7 +121,13 @@ async def _stream_intelligence(repo: str, db: Session, request: Request):
     try:
         yield _sse_event({"type": "status", "payload": {"msg": "Accessing Matrix Cache..."}})
         
-        clusters = db.query(ClusterModel).filter(ClusterModel.repo_name == repo).all()
+        # Filter out pre-migration rows that have no cluster_label
+        clusters = (
+            db.query(ClusterModel)
+            .filter(ClusterModel.repo_name == repo, ClusterModel.cluster_label.isnot(None))
+            .order_by(ClusterModel.cluster_label)
+            .all()
+        )
         
         if not clusters:
             issue_count = db.query(IssueModel).filter(IssueModel.repo_name == repo).count()
@@ -140,12 +146,12 @@ async def _stream_intelligence(repo: str, db: Session, request: Request):
                     "type": "cluster_found",
                     "payload": {
                         "cluster_label": c.cluster_label,
-                        "insight": c.summary_insight,
-                        "llm_summary": c.llm_full_analysis,
-                        "similarity_score": f"{c.similarity_score}%",
-                        "issue_count": c.size,
-                        "urgency": c.urgency,
-                        "github_issue_numbers": [int(n) for n in c.github_issue_numbers.split(",")],
+                        "insight": c.summary_insight or "Unnamed Cluster",
+                        "llm_summary": c.llm_full_analysis or "",
+                        "similarity_score": f"{c.similarity_score or 0:.1f}%",
+                        "issue_count": c.size or 0,
+                        "urgency": c.urgency or "Medium",
+                        "github_issue_numbers": c.github_issue_numbers or "",
                         "progress": "Loaded from DB cache",
                     }
                 })
@@ -396,7 +402,7 @@ async def get_vector_stats(repo: str, db: Session = Depends(get_db)):
 _events_etag = {}
 _events_last_check = {}
 
-@router.websocket("/ws/sync/{repo}")
+@router.websocket("/ws/sync/{repo:path}")
 async def websocket_sync_progress(websocket: WebSocket, repo: str):
     """
     Real-time WebSocket: sync progress + GitHub Events incremental detection.
