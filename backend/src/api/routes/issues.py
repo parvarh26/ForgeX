@@ -61,3 +61,10 @@ async def ingest_issue(issue: IssueCreate, background_tasks: BackgroundTasks, db
     except Exception as e:
         log.error(f"Heuristic pipeline failed, degraded response returned: {e}")
         # Graceful degradation
+        return IssueResponse(
+            id=db_issue.id,
+            title=db_issue.title,
+            priority_score=0.5,
+            duplicate_count=0,
+            similar_issues=[]
+        )
