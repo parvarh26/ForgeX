@@ -8,3 +8,13 @@ Full codebase assessed. The foundation is solid: FastAPI + FAISS + DBSCAN + Sent
 
 ## Gap Analysis (Current vs. Plan)
 
+| Feature | Status | Gap |
+|---|---|---|
+| GitHub API integration | ❌ Missing | No `POST /api/v1/github/sync` route |
+| SSE Streaming | ❌ Missing | Dashboard polls REST, no `StreamingResponse` |
+| Thread-pool chunking (mod 16) | ❌ Missing | Embeddings run synchronously in-request |
+| Multi-tenant DB schema | ❌ Missing | No `repo_name` column in Issue/Cluster models |
+| Scorched-earth repo reset | ❌ Missing | No cleanup before new repo ingestion |
+| DBSCAN epsilon = 0.28 | ❌ Missing | Config is `0.5` |
+| Real LLM context (not mock) | ❌ Missing | `clusters.py` uses `"mock login text"` hardcoded |
+| Frontend free-text repo input | ❌ Missing | RepoSelect uses 3 hardcoded mock repos |
