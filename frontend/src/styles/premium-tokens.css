@@ -16,3 +16,9 @@
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-pill: 99px;
+  
+  /* Shadows that feel physical */
+  --shadow-elevated: 0 4px 12px rgba(0,0,0,1), 0 0 0 1px rgba(255,255,255,0.06);
+  --shadow-hover: 0 12px 24px rgba(0,0,0,1), 0 0 0 1px rgba(255,255,255,0.12);
+  
+  /* Micro Accents */
