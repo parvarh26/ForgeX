@@ -28,3 +28,8 @@ def _sse_event(payload: dict) -> str:
 
 async def _stream_intelligence(repo: str, db: Session):
     """
+    Core SSE generator — implements the full flow from plan.md §7.
+
+    1. Scorched-earth cleanup for the repo tenant
+    2. Fetch 200 issues from GitHub via HTTPX (Industrial Scaling)
+    3. Initialize ephemeral FAISS space
