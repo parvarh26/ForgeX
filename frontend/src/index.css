@@ -1,0 +1,8 @@
+/*
+  OpenIssue CSS Reset
+  This file is a legacy anchor that redirects to the primary design system
+  located in src/styles/global.css to prevent duplicate styling conflicts.
+*/
+
+@import './styles/global.css';
+
