@@ -178,3 +178,8 @@ async def _stream_intelligence(repo: str, db: Session):
 
     except Exception as e:
         log.error(f"SSE stream faulted: {e}", exc_info=True)
+        yield _sse_event({"type": "error", "payload": {"msg": f"Pipeline fault: {str(e)}"}})
+
+
+async def background_crawl(repo: str, db_factory):
+    """
