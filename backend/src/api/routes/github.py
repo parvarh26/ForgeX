@@ -118,3 +118,8 @@ async def _stream_intelligence(repo: str, db: Session):
 
             cluster_map = clusterer.compute_clusters(all_vecs, all_ids)
 
+            # ── Yield newly discovered / updated clusters ────────────────────
+            for label, group_ids in cluster_map.items():
+                if label == -1:
+                    continue  # DBSCAN noise — skip
+
