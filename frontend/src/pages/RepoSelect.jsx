@@ -172,3 +172,9 @@ export default function RepoSelect() {
             cursor: 'pointer'
           }}
         >
+          {syncing ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              Initializing pipeline...
+            </div>
+          ) : (
+            <>Sync Repository <ArrowRight size={18} /></>
