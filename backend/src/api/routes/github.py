@@ -218,3 +218,8 @@ async def sync_repository(request: SyncRequest, background_tasks: BackgroundTask
     """
     POST /api/v1/github/sync
     
+    Trigger a dual-phase sync:
+    1. Real-time SSE stream for first 100 issues (Immediate UX).
+    2. Background crawl for the full repository (Long-term Cache).
+    """
+    log.info(f"SSE sync initiated for repo: {request.repo}")
