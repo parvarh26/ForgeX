@@ -178,3 +178,9 @@ export default function RepoSelect() {
             </div>
           ) : (
             <>Sync Repository <ArrowRight size={18} /></>
+          )}
+        </button>
+      </div>
+
+      {/* Suggested repos */}
+      <div className="stagger-3" style={{ width: '100%', maxWidth: '520px' }}>
