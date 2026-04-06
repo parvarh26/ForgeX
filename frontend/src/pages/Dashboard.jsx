@@ -62,3 +62,11 @@ function ClusterCard({ cluster, index }) {
       className="surface-card interactive"
       style={{
         position: 'relative',
+        overflow: 'hidden',
+        animation: 'fadeUpIn 600ms cubic-bezier(0.16, 1, 0.3, 1) both',
+        animationDelay: `${index * 60}ms`,
+        borderColor: isCritical ? 'rgba(239,68,68,0.2)' : 'var(--border-subtle)',
+      }}
+    >
+      {/* Critical red accent stripe */}
+      {isCritical && (
