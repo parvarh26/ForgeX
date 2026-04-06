@@ -28,3 +28,13 @@ Full codebase assessed. The foundation is solid: FastAPI + FAISS + DBSCAN + Sent
 ### Backend — Core ML Pipeline
 
 #### [MODIFY] [config.py](file:///Users/mac/Desktop/CHAINVOTE/backend/src/core/config.py)
+- Set `DBSCAN_EPS` default to `0.28`
+- Add `GITHUB_TOKEN: Optional[str] = None` field
+
+#### [MODIFY] [models.py](file:///Users/mac/Desktop/CHAINVOTE/backend/src/db/models.py)
+- Add `repo_name = Column(String, index=True)` to `IssueModel`
+- Add `repo_name = Column(String, index=True)` to `ClusterModel`
+- Add `github_issue_id = Column(Integer)` to `IssueModel` (dedup key from GitHub)
+
+---
+
