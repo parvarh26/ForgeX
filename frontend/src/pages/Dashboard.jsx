@@ -422,3 +422,11 @@ export default function Dashboard() {
         {hasError && (
           <div className="stagger-1" style={{ marginTop: '24px', padding: '28px', background: 'rgba(255,69,58,0.03)', border: '1px solid rgba(255,69,58,0.15)', borderRadius: 'var(--radius-md)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}><XCircle size={20} color="var(--accent-critical)" /><p style={{ color: 'var(--accent-critical)', fontSize: '1rem', fontWeight: 600 }}>Pipeline Fault Detected</p></div>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', lineHeight: 1.5 }}>{statusMsg}</p>
+            <button className="btn-premium" onClick={startStream} style={{ marginTop: '24px', padding: '12px 24px', fontSize: '0.9rem', background: 'var(--accent-critical)', color: 'white' }}>Retry Handshake</button>
+          </div>
+        )}
+      </main>
+
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
