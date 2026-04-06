@@ -398,3 +398,11 @@ export default function Dashboard() {
               <span>Vectorizing incidents</span>
               <span>{progress.processed} / {progress.total} Mapped</span>
             </div>
+            <div style={{ height: '4px', background: 'rgba(255,255,255,0.03)', border: 'var(--border-subtle)', borderRadius: 'var(--radius-pill)', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${progressPct}%`, background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)', borderRadius: 'var(--radius-pill)', transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} />
+            </div>
+          </div>
+        )}
+
+        {navActive === 'Intelligence' && renderIntelligence()}
+        {navActive === 'Spatial Matrix' && renderSpatialMatrix()}
