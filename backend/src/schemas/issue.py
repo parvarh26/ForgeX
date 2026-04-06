@@ -16,3 +16,9 @@ class IssueCreate(BaseModel):
 
 class IssueResponse(BaseModel):
     id: int
+    title: str
+    priority_score: float
+    duplicate_count: int
+    similar_issues: List[int]
+
+class ClusterInsightResponse(BaseModel):
