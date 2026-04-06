@@ -62,3 +62,11 @@ class GitHubService:
                     raise ValueError(f"GitHub API error {response.status_code}: {response.text[:200]}")
 
                 raw_batch = response.json()
+                if not raw_batch:
+                    break # No more results
+
+                # Filter and clean
+                for item in raw_batch:
+                    if "pull_request" not in item:
+                        all_cleaned.append({
+                            "github_issue_id": item.get("number"),
