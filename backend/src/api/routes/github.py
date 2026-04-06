@@ -148,3 +148,8 @@ async def _stream_intelligence(repo: str, db: Session):
                             "issue_count": len(group_ids),
                             "urgency": urgency,
                             "github_issue_numbers": github_numbers,
+                            "progress": f"{min(chunk_start + CHUNK_SIZE, total)}/{total} issues processed",
+                        }
+                    })
+
+            yield _sse_event({
