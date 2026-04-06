@@ -94,3 +94,11 @@ function ClusterCard({ cluster, index }) {
           </h3>
         </div>
 
+        <div style={{
+          flexShrink: 0, marginLeft: '16px',
+          background: 'rgba(255,255,255,0.03)',
+          border: 'var(--border-subtle)',
+          padding: '6px 14px',
+          borderRadius: 'var(--radius-pill)',
+          fontSize: '0.75rem',
+          fontWeight: 600,
