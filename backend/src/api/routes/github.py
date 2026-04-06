@@ -78,3 +78,8 @@ async def _stream_intelligence(repo: str, db: Session):
         # Persist raw issues to DB first (speed layer)
         db_issue_map = {}  # github_issue_id -> db row id
         for raw in raw_issues:
+            db_issue = IssueModel(
+                repo_name=repo,
+                github_issue_id=raw["github_issue_id"],
+                title=raw["title"],
+                body=raw["body"],
