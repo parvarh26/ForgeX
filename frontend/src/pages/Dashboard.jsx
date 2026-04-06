@@ -430,3 +430,7 @@ export default function Dashboard() {
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
+      `}</style>
+    </div>
+  );
+}
