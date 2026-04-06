@@ -374,3 +374,11 @@ export default function Dashboard() {
           {NAV_ITEMS.map(item => (
             <div key={item.label} onClick={() => setNavActive(item.label)} className="anim-base" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 14px', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500, color: navActive === item.label ? 'var(--color-text-primary)' : 'var(--color-text-muted)', background: navActive === item.label ? 'rgba(255,255,255,0.05)' : 'transparent' }}>
               {item.icon} {item.label}
+            </div>
+          ))}
+        </nav>
+        <div onClick={() => navigate('/select-repo')} className="anim-base" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: 'auto', borderTop: 'var(--border-subtle)', paddingTop: '24px' }}>
+          <ArrowLeft size={14} /> New Sync Pipeline
+        </div>
+      </aside>
+
