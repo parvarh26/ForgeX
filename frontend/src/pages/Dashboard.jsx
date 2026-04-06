@@ -214,3 +214,11 @@ export default function Dashboard() {
         throw new Error(`Pipeline refused connection (${response.status})`);
       }
 
+      for await (const event of readSSEStream(response)) {
+        const { type, payload } = event;
+
+        if (type === 'status') setStatusMsg(payload.msg);
+        if (type === 'progress') {
+          setStatusMsg(payload.msg);
+          setProgress({ processed: payload.processed, total: payload.total });
+        }
