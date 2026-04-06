@@ -38,3 +38,11 @@ function StatusPill({ msg, streaming, complete, hasError }) {
   const Icon = hasError ? XCircle : complete ? CheckCircle2 : Loader2;
 
   return (
+    <div style={{
+      display: 'inline-flex', alignItems: 'center', gap: '10px',
+      padding: '8px 16px',
+      background: 'rgba(255,255,255,0.03)',
+      border: `1px solid ${hasError ? 'rgba(239,68,68,0.2)' : 'var(--border-subtle)'}`,
+      borderRadius: 'var(--radius-pill)',
+      fontSize: '0.8rem',
+      color: color,
