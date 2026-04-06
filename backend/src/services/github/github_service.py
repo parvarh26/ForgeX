@@ -70,3 +70,11 @@ class GitHubService:
                     if "pull_request" not in item:
                         all_cleaned.append({
                             "github_issue_id": item.get("number"),
+                            "title": item.get("title", "").strip(),
+                            "body": (item.get("body") or "").strip()[:2000],
+                        })
+                        if len(all_cleaned) >= limit:
+                            break
+                
+                page += 1
+                # Small safety delay to avoid hitting primary rate limits too fast
