@@ -10,3 +10,9 @@
   --color-text-secondary: #888888;
   --color-text-muted: #555555;
   
+  /* Structure */
+  --border-subtle: 1px solid rgba(255, 255, 255, 0.08);
+  --border-focus: 1px solid rgba(255, 255, 255, 0.2);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-pill: 99px;
