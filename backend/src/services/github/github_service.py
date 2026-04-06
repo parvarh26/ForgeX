@@ -46,3 +46,11 @@ class GitHubService:
                 params = {
                     "state": "open",
                     "per_page": per_page,
+                    "page": page,
+                    "sort": "created",
+                    "direction": "desc"
+                }
+
+                log.info(f"Fetching page {page} of issues from {repo}...")
+                response = await client.get(url, headers=self._build_headers(), params=params)
+
