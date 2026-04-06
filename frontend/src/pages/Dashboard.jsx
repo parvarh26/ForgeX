@@ -150,3 +150,11 @@ function ClusterCard({ cluster, index }) {
         <div style={{ marginTop: '16px', fontSize: '0.7rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <Activity size={12} /> {cluster.progress}
         </div>
+      )}
+    </div>
+  );
+}
+
+// ── Main Dashboard ────────────────────────────────────────────────────────────
+
+export default function Dashboard() {
