@@ -136,3 +136,9 @@ export default function RepoSelect() {
             style={{
               width: '100%',
               padding: '16px 16px 16px 44px',
+              background: 'rgba(255,255,255,0.03)',
+              border: `1px solid ${error ? 'rgba(239,68,68,0.4)' : 'var(--border-subtle)'}`,
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--color-text-primary)',
+              fontSize: '1rem',
+              fontFamily: 'inherit',
