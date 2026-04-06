@@ -53,3 +53,8 @@ button {
   transform: translateY(-2px);
   box-shadow: var(--shadow-hover);
 }
+
+/* Premium Button */
+.btn-premium {
+  display: inline-flex;
+  align-items: center;
