@@ -88,3 +88,8 @@ async def _stream_intelligence(repo: str, db: Session):
             db.add(db_issue)
         db.commit()
         # Refresh to get assigned IDs
+        all_db_issues = db.query(IssueModel).filter(IssueModel.repo_name == repo).all()
+        for db_issue in all_db_issues:
+            db_issue_map[db_issue.github_issue_id] = db_issue
+
+        # ── THREAD-POOL CHUNKING (mod 16) ─────────────────────────────────────
