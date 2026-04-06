@@ -25,3 +25,12 @@ async def get_clusters():
     # For speed in simulation, we will mock the LLM context fetching here.
     cluster_id_counter = 1
     for label, group_ids in cluster_map.items():
+        if label == -1: # Noise
+            continue
+            
+        # Generate insight based on cluster items
+        # Normally we'd ORM query the `body` field of the `group_ids` from DB
+        insight = llm.generate_cluster_insight(["mock login text"] if cluster_id_counter==1 else ["mock ui text"])
+        
+        urgency = "Critical" if len(group_ids) >= 3 else "Medium"
+        
