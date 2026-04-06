@@ -30,3 +30,11 @@ def create_app() -> FastAPI:
     # SSE streaming GitHub sync — the core of plan.md
     app.include_router(github.router, prefix="/api/v1/github", tags=["GitHub"])
     # System telemetry for Dashboard status
+    app.include_router(system.router, prefix="/api/v1/system", tags=["System"])
+
+    @app.on_event("startup")
+    async def startup_event():
+        log.info("Booting Intelligence Pipeline...")
+        # Dependency Injection of singletons mapped to routers
+        issues.v_store = VectorStore(dimension=embedder.dimension)
+        log.info("Vector Store dynamically linked.")
