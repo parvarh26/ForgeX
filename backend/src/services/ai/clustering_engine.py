@@ -28,3 +28,8 @@ class ClusteringEngine:
                 lbl_int = int(label)
                 if lbl_int not in cluster_map:
                     cluster_map[lbl_int] = []
+                cluster_map[lbl_int].append(ids[index])
+                
+            return cluster_map
+        except Exception as e:
+            log.error(f"Clustering failed: {e}")
