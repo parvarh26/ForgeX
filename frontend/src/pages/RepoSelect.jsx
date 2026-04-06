@@ -70,3 +70,9 @@ export default function RepoSelect() {
         filter: 'blur(60px)', pointerEvents: 'none'
       }} />
 
+      {/* Logo mark */}
+      <div className="stagger-1" style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '8px',
+        marginBottom: '40px',
