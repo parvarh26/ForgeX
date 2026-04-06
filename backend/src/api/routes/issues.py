@@ -26,3 +26,10 @@ async def ingest_issue(issue: IssueCreate, background_tasks: BackgroundTasks, db
     db.refresh(db_issue)
     
     # 2. NLP Pipeline
+    try:
+        combined_text = f"{issue.title}. {issue.body}"
+        vector = embedder.generate_embedding(combined_text)
+        
+        # 3. Synchronous similarity check to classify duplicate count immediately
+        similar_results = []
+        if v_store:
