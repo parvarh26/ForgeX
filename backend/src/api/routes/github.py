@@ -98,3 +98,8 @@ async def _stream_intelligence(repo: str, db: Session):
         seen_cluster_labels = {}  # track clusters emitted so far
 
         for chunk_start in range(0, total, CHUNK_SIZE):
+            batch_raw = raw_issues[chunk_start: chunk_start + CHUNK_SIZE]
+            batch_texts = [f"{i['title']}. {i['body']}" for i in batch_raw]
+
+            # Shift heavy CPU math (PyTorch SIMD) into thread-pool — plan §4.1
+            vectors = await run_in_threadpool(embedder.generate_embeddings, batch_texts)
