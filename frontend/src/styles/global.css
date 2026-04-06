@@ -63,3 +63,8 @@ button {
   color: var(--color-base);
   padding: 12px 24px;
   border-radius: var(--radius-pill);
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
