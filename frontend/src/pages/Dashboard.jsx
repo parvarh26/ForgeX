@@ -246,3 +246,11 @@ export default function Dashboard() {
       }
     } catch (err) {
       if (err.name !== 'AbortError') {
+        setStatusMsg(err.message || 'Engine connection fault.');
+        setHasError(true);
+        setStreaming(false);
+      }
+    }
+  }
+
+  const renderIntelligence = () => (
