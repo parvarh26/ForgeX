@@ -43,3 +43,12 @@ def get_db():
     finally:
         db.close()
 
+def scorched_earth_for_repo(db, repo_name: str):
+    """
+    Atomically wipes all Issue and Cluster records for a given repo tenant.
+    Executed before each new sync to prevent spatial matrix contamination — plan.md §5.1.
+    """
+    deleted_issues = db.query(IssueModel).filter(IssueModel.repo_name == repo_name).delete()
+    deleted_clusters = db.query(ClusterModel).filter(ClusterModel.repo_name == repo_name).delete()
+    db.commit()
+    return deleted_issues, deleted_clusters
