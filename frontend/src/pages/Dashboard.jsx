@@ -118,3 +118,11 @@ function ClusterCard({ cluster, index }) {
         {cluster.github_issue_numbers?.slice(0, 10).map(num => (
           <a
             key={num}
+            href={`https://github.com/${cluster.repo}/issues/${num}`}
+            target="_blank"
+            rel="noreferrer"
+            className="anim-base"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '4px',
+              padding: '5px 12px',
+              background: 'rgba(255,255,255,0.02)',
