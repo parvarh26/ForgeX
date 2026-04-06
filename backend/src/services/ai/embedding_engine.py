@@ -7,3 +7,12 @@ log = setup_logger("openissue.embedding")
 
 class EmbeddingEngine:
     def __init__(self):
+        try:
+            log.info(f"Loading embedding model {settings.EMBEDDING_MODEL_NAME}...")
+            self.model = SentenceTransformer(settings.EMBEDDING_MODEL_NAME)
+            self.dimension = self.model.get_sentence_embedding_dimension()
+            log.info(f"Model loaded with dimension {self.dimension}")
+        except Exception as e:
+            log.error(f"Failed to load sentence-transformer: {e}")
+            raise
+
