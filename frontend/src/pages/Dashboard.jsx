@@ -6,3 +6,11 @@ import {
 } from 'lucide-react';
 
 // ── SSE parsing helper ────────────────────────────────────────────────────────
+async function* readSSEStream(response) {
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
