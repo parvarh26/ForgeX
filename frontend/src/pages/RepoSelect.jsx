@@ -46,3 +46,9 @@ export default function RepoSelect() {
     if (e.key === 'Enter') handleSync();
   };
 
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
