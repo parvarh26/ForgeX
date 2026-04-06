@@ -230,3 +230,11 @@ export default function Dashboard() {
               next[existing] = { ...payload, repo };
               return next;
             }
+            return [...prev, { ...payload, repo }];
+          });
+        }
+        if (type === 'complete') {
+          setStatusMsg(payload.msg);
+          setStreaming(false);
+          setComplete(true);
+        }
